@@ -64,7 +64,9 @@ flowchart LR
   records** — how "everybody"/"all" is represented — and compiles to an empty
   MongoDB filter `{}`. `remove` also takes an optional `limit` ("delete any
   one record"). Records carry a unique `_id`, shown in the GUI, so identical
-  rows remain addressable.
+  rows remain addressable. A `command` may be a single operation or an array
+  of operations, so multi-task instructions ("move from people and pension")
+  compile to one plan.
 - **Translator:** JSON output mode, JSON Schema embedded in the system prompt,
   one-shot corrective retry, tolerant parsing of a stray trailing token,
   temperature 0. The prompt carries **no dictionary of word meanings**: the
@@ -186,7 +188,9 @@ failure modes:
 - Architecture insight: the system deliberately keeps **no dictionary of word
   meanings** — interpretation is delegated to the LLM and ambiguity is resolved
   by a confirmation protocol; only finite, structural (operation-level) mappings
-  live in the prompt.
+  live in the prompt. Synonyms such as record/row/document/item are absorbed by
+  the model, not enumerated; the docs contain only the formal IR and the domain
+  schema (see `docs/glossary.md`).
 - The IR's formal constraints surface failure modes: requiring `condition` made
   the LLM hallucinate a filter; making it optional removed the failure at the
   source instead of patching the model.

@@ -148,3 +148,13 @@ def validate(command: Operation) -> Operation:
     else:  # pragma: no cover — the discriminated union is exhaustive
         raise SemanticError(f"Unsupported operation: {command!r}")
     return command
+
+
+def validate_command(command: Any) -> Any:
+    """Validate a single operation or every operation in a sequence."""
+    if isinstance(command, list):
+        for c in command:
+            validate(c)
+        return command
+    validate(command)
+    return command

@@ -11,11 +11,11 @@ import json
 import sys
 from typing import Any, Callable
 
-from compiler.mongodb import compile_operation
-from ir.models import TranslationResult
+from compiler.mongodb import compile_command
+from ir.models import TranslationResult, command_to_json
 from runtime.database import MemoryStore, Store, StoreError, execute_plan
 from translator import TranslationError, Translator
-from validator.semantic import SemanticError, validate
+from validator.semantic import SemanticError, validate_command
 
 MAX_ROUNDS = 3
 
@@ -70,33 +70,33 @@ def _outcome(
 def _execute_command(
     instruction: str, command: Any, store: Store, rounds: int
 ) -> dict[str, Any]:
-    """Validate, compile, and execute a (possibly LLM-proposed) command."""
+    """Validate, compile, and execute a command (single operation or sequence)."""
     try:
-        validate(command)  # semantic (domain) rules
+        validate_command(command)  # semantic (domain) rules
     except SemanticError as exc:
         return _outcome(
             "invalid",
             instruction,
             rounds=rounds,
-            ir=command.model_dump(),
+            ir=command_to_json(command),
             error=f"Semantic validation failed: {exc}",
         )
     try:
-        plan = compile_operation(command)
+        plan = compile_command(command)
         execution = execute_plan(plan, store)
     except StoreError as exc:
         return _outcome(
             "error",
             instruction,
             rounds=rounds,
-            ir=command.model_dump(),
+            ir=command_to_json(command),
             error=f"Execution failed: {exc}",
         )
     return _outcome(
         "executed",
         instruction,
         rounds=rounds,
-        ir=command.model_dump(),
+        ir=command_to_json(command),
         plan=plan.to_dict(),
         execution=execution,
     )
@@ -174,7 +174,7 @@ def process_instruction(
                     "needs_confirmation",
                     instruction,
                     rounds=rounds,
-                    ir=command.model_dump(),
+                    ir=command_to_json(command),
                     clarification=details,
                 )
             answer = confirm_fn(details["message"])
@@ -190,7 +190,7 @@ def process_instruction(
                 "needs_confirmation",
                 instruction,
                 rounds=rounds,
-                ir=command.model_dump(),
+                ir=command_to_json(command),
                 clarification=details,
                 error="Not confirmed by the user.",
             )

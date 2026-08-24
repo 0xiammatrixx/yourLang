@@ -157,3 +157,17 @@ def compile_operation(command: Operation) -> CompiledPlan:
         )
 
     raise CompileError(f"Unsupported operation: {command!r}")
+
+
+def compile_command(command: Any) -> CompiledPlan:
+    """Compile a single operation or a sequence into one execution plan."""
+    if isinstance(command, list):
+        steps: list[Step] = []
+        return_store = None
+        for c in command:
+            plan = compile_operation(c)
+            steps.extend(plan.steps)
+            if plan.return_store is not None:
+                return_store = plan.return_store
+        return CompiledPlan(steps=steps, return_store=return_store)
+    return compile_operation(command)

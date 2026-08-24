@@ -35,6 +35,10 @@ def confirming(command: dict, message: str) -> TranslationResult:
     )
 
 
+def complete_list(commands: list[dict]) -> TranslationResult:
+    return TranslationResult.model_validate({"status": "complete", "command": commands})
+
+
 class FakeTranslator:
     """Returns scripted responses; records every call."""
 
@@ -141,4 +145,35 @@ def test_confirmation_no_stops():
     )
     assert outcome["status"] == "needs_confirmation"
     assert "Not confirmed" in outcome["error"]
+    assert len(store.find("pension", None)) == 0
+
+
+def test_multiple_operations_execute():
+    store = seed_demo_store()
+    fake = FakeTranslator(
+        [
+            complete_list(
+                [
+                    {
+                        "operation": "move",
+                        "source": "people",
+                        "destination": "employees",
+                        "condition": {"field": "age", "operator": ">", "value": 60},
+                    },
+                    {
+                        "operation": "move",
+                        "source": "people",
+                        "destination": "pension",
+                        "condition": {"field": "age", "operator": "<", "value": 18},
+                    },
+                ]
+            )
+        ]
+    )
+    outcome = process_instruction(
+        "Move the over-60s to employees and the under-18s to pension.", fake, store
+    )
+    assert outcome["status"] == "executed"
+    assert sorted(d["name"] for d in store.find("employees", None)) == ["Alice", "Ben"]
+    assert [d["name"] for d in store.find("people", None)] == ["David"]
     assert len(store.find("pension", None)) == 0

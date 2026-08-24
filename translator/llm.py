@@ -95,6 +95,10 @@ Rules:
     captured by the representation. If clauses conflict with each other or cannot
     all be represented, set "status" to "needs_clarification" and explain the
     conflict in "message".
+12. If the instruction describes SEVERAL operations (e.g. "move from people and
+    pension to employees", or "move X and copy Y"), return "command" as a JSON
+    ARRAY of operation objects, one per operation, in the order given. A single
+    operation may still be returned as a single object.
 
 Examples:
 Instruction: "Move all employees whose salary is below 30000 to pension."
@@ -119,6 +123,12 @@ Response: {"status": "needs_confirmation", "command": {"operation": "update", "s
 "condition": {"field": "salary", "operator": ">", "value": 100000},
 "set": {"status": "retired"}},
 "clarification": {"message": "Did you mean: set their status to retired? Or move them to pension?", "missing": []}}
+
+Instruction: "Move every record from people and pension to employees."
+Response: {"status": "complete", "command": [
+  {"operation": "move", "source": "people", "destination": "employees", "condition": null},
+  {"operation": "move", "source": "pension", "destination": "employees", "condition": null}
+]}
 
 JSON Schema:
 {schema}

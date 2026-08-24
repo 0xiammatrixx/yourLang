@@ -5,6 +5,7 @@ from .mongodb import (
     CompiledPlan,
     CompileError,
     Step,
+    compile_command,
     compile_operation,
     condition_to_filter,
 )
@@ -14,6 +15,7 @@ __all__ = [
     "CompiledPlan",
     "CompileError",
     "Step",
+    "compile_command",
     "compile_operation",
     "condition_to_filter",
 ]

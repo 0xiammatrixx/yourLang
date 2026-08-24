@@ -5,6 +5,13 @@ from .semantic import (
     SemanticError,
     known_collections,
     validate,
+    validate_command,
 )
 
-__all__ = ["COLLECTION_SCHEMA", "SemanticError", "known_collections", "validate"]
+__all__ = [
+    "COLLECTION_SCHEMA",
+    "SemanticError",
+    "known_collections",
+    "validate",
+    "validate_command",
+]

@@ -9,6 +9,7 @@ Architecture role:
 from .models import (
     AddOperation,
     ClarificationRequest,
+    Command,
     Condition,
     CopyOperation,
     CreateOperation,
@@ -18,11 +19,13 @@ from .models import (
     RemoveOperation,
     TranslationResult,
     UpdateOperation,
+    command_to_json,
 )
 
 __all__ = [
     "AddOperation",
     "ClarificationRequest",
+    "Command",
     "Condition",
     "CopyOperation",
     "CreateOperation",
@@ -32,4 +35,5 @@ __all__ = [
     "RemoveOperation",
     "TranslationResult",
     "UpdateOperation",
+    "command_to_json",
 ]

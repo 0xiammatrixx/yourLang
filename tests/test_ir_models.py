@@ -158,3 +158,18 @@ def test_remove_limit_parses_and_validates():
                 "command": {"operation": "remove", "source": "people", "limit": 0},
             }
         )
+
+
+def test_command_sequence_parses():
+    result = TranslationResult.model_validate(
+        {
+            "status": "complete",
+            "command": [
+                {"operation": "move", "source": "people", "destination": "employees"},
+                {"operation": "move", "source": "pension", "destination": "employees"},
+            ],
+        }
+    )
+    assert isinstance(result.command, list)
+    assert len(result.command) == 2
+    assert result.command[0].operation == "move"

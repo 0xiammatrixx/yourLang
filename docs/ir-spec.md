@@ -11,7 +11,7 @@ Every LLM response must match exactly one of two states:
 | Field | Type | Notes |
 |---|---|---|
 | `status` | `"complete" \| "needs_clarification" \| "needs_confirmation"` | discriminates the payload |
-| `command` | `Operation \| null` | required iff `status == "complete"` or `"needs_confirmation"` |
+| `command` | `Operation \| list[Operation] \| null` | a single operation, or an array for multi-task instructions |
 | `clarification` | `ClarificationRequest \| null` | required iff `status == "needs_clarification"` or `"needs_confirmation"` |
 
 Invariants (enforced by a model validator):

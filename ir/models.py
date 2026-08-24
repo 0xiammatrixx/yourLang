@@ -135,6 +135,16 @@ Operation = Annotated[
     Field(discriminator="operation"),
 ]
 
+# One instruction may describe several operations at once.
+Command = Operation | list[Operation]
+
+
+def command_to_json(command: Command) -> dict | list[dict]:
+    """Serialize a command (single operation or a sequence) to plain JSON."""
+    if isinstance(command, list):
+        return [c.model_dump() for c in command]
+    return command.model_dump()
+
 
 # ---------------------------------------------------------------------------
 # The LLM-facing wrapper
@@ -159,7 +169,7 @@ class TranslationResult(BaseModel):
     """
 
     status: Literal["complete", "needs_clarification", "needs_confirmation"]
-    command: Operation | None = None
+    command: Command | None = None
     clarification: ClarificationRequest | None = None
 
     @model_validator(mode="after")

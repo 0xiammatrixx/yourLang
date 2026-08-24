@@ -3,7 +3,7 @@
 import pytest
 
 from ir.models import TranslationResult
-from validator.semantic import SemanticError, validate
+from validator.semantic import SemanticError, validate, validate_command
 
 
 def command(raw: dict):
@@ -76,6 +76,14 @@ def test_cannot_set_record_id():
                 }
             )
         )
+
+
+def test_validate_command_sequence():
+    ok = command({"operation": "move", "source": "people", "destination": "employees"})
+    bad = command({"operation": "move", "source": "banana", "destination": "employees"})
+    validate_command([ok, ok])
+    with pytest.raises(SemanticError):
+        validate_command([ok, bad])
 
 
 def test_unknown_source_rejected():

@@ -6,6 +6,7 @@ import pytest
 
 from compiler.mongodb import (
     MONGO_OPERATOR,
+    compile_command,
     compile_operation,
     condition_to_filter,
 )
@@ -72,6 +73,19 @@ def test_remove_with_limit_compiles():
     assert plan.steps[0].action == "delete_many"
     assert plan.steps[0].limit == 1
     assert plan.steps[0].filter == {}
+
+
+def test_compile_command_sequence():
+    a = command({"operation": "move", "source": "people", "destination": "employees"})
+    b = command({"operation": "copy", "source": "people", "destination": "pension"})
+    plan = compile_command([a, b])
+    assert [s.action for s in plan.steps] == [
+        "find",
+        "delete_many",
+        "insert_many",
+        "find",
+        "insert_many",
+    ]
 
 
 def test_move_compiles_to_three_steps():

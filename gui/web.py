@@ -8,12 +8,12 @@ from __future__ import annotations
 
 from typing import Any
 
-from compiler.mongodb import compile_operation
-from ir.models import TranslationResult
+from compiler.mongodb import compile_command
+from ir.models import TranslationResult, command_to_json
 from main import _follow_up, seed_demo_store
 from runtime.database import MemoryStore, execute_plan
 from translator import TranslationError
-from validator.semantic import SemanticError, validate
+from validator.semantic import SemanticError, validate_command
 
 
 def new_store() -> MemoryStore:
@@ -22,22 +22,22 @@ def new_store() -> MemoryStore:
 
 
 def _execute(instruction: str, command: Any, store: MemoryStore) -> dict[str, Any]:
-    """Validate, compile, and execute a command."""
+    """Validate, compile, and execute a command (single operation or sequence)."""
     try:
-        validate(command)  # semantic (domain) rules
+        validate_command(command)  # semantic (domain) rules
     except SemanticError as exc:
         return {
             "status": "invalid",
             "instruction": instruction,
-            "ir": command.model_dump(),
+            "ir": command_to_json(command),
             "error": f"Semantic validation failed: {exc}",
         }
-    plan = compile_operation(command)
+    plan = compile_command(command)
     execution = execute_plan(plan, store)
     return {
         "status": "executed",
         "instruction": instruction,
-        "ir": command.model_dump(),
+        "ir": command_to_json(command),
         "plan": plan.to_dict(),
         "execution": execution,
     }
@@ -108,12 +108,12 @@ def run_web(
             "kind": "confirm",
             "instruction": instruction,
             "question": clarification.message,
-            "command": command.model_dump(),
+            "command": command_to_json(command),
         }
         return {
             "status": "needs_confirmation",
             "instruction": instruction,
-            "ir": command.model_dump(),
+            "ir": command_to_json(command),
             "clarification": {
                 "message": clarification.message,
                 "missing": clarification.missing,
