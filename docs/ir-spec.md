@@ -28,7 +28,7 @@ All operations forbid unknown fields (`extra="forbid"`).
 |---|---|---|
 | `create` | `destination` | `{"operation":"create","destination":"archive"}` |
 | `add` | `destination`, `records` (≥1) | insert records into a collection |
-| `remove` | `source`, `condition` | `{"operation":"remove","source":"people","condition":{…}}` |
+| `remove` | `source`, `condition` (optional), `limit` (optional) | delete matching records; `limit` caps how many |
 | `move` | `source`, `destination`, `condition` | move matching records to destination |
 | `copy` | `source`, `destination`, `condition` | copy without deleting source |
 | `find` | `source`, `condition` | return matching records (read-only) |

@@ -28,7 +28,9 @@ class Store(Protocol):
 
     def insert_many(self, collection: str, documents: list[dict]) -> int: ...
 
-    def delete_many(self, collection: str, filter: dict[str, Any] | None) -> int: ...
+    def delete_many(
+        self, collection: str, filter: dict[str, Any] | None, limit: int | None = None
+    ) -> int: ...
 
     def update_many(
         self, collection: str, filter: dict[str, Any] | None, updates: dict[str, Any]
@@ -79,9 +81,15 @@ class MemoryStore:
     """Deterministic in-memory store: {collection: [documents]}."""
 
     def __init__(self, data: dict[str, list[dict]] | None = None) -> None:
-        self._data: dict[str, list[dict]] = {
-            name: [dict(doc) for doc in docs] for name, docs in (data or {}).items()
-        }
+        self._next_id = 1
+        self._data: dict[str, list[dict]] = {}
+        for name, docs in (data or {}).items():
+            self._data[name] = []
+            for doc in docs:
+                stored = dict(doc)
+                stored["_id"] = self._next_id
+                self._next_id += 1
+                self._data[name].append(stored)
 
     def list_collections(self) -> list[str]:
         return sorted(self._data)
@@ -91,21 +99,37 @@ class MemoryStore:
             raise StoreError(f"Unknown collection '{collection}'.")
         return self._data[collection]
 
+    @staticmethod
+    def _strip_ids(docs) -> list[dict]:
+        return [{k: v for k, v in d.items() if k != "_id"} for d in docs]
+
     def find(self, collection: str, filter: dict[str, Any] | None) -> list[dict]:
         docs = self._require(collection)
         if not filter:
-            return [dict(d) for d in docs]
-        return [dict(d) for d in docs if _matches(d, filter)]
+            return self._strip_ids(docs)
+        return self._strip_ids(d for d in docs if _matches(d, filter))
 
     def insert_many(self, collection: str, documents: list[dict]) -> int:
         self._require(collection)
         for doc in documents:
-            self._data[collection].append(dict(doc))
+            stored = {k: v for k, v in doc.items() if k != "_id"}
+            stored["_id"] = self._next_id
+            self._next_id += 1
+            self._data[collection].append(stored)
         return len(documents)
 
-    def delete_many(self, collection: str, filter: dict[str, Any] | None) -> int:
+    def delete_many(
+        self,
+        collection: str,
+        filter: dict[str, Any] | None,
+        limit: int | None = None,
+    ) -> int:
         docs = self._require(collection)
-        keep = [d for d in docs if not _matches(d, filter or {})]
+        matches = [d for d in docs if _matches(d, filter or {})]
+        if limit is not None:
+            matches = matches[:limit]
+        match_ids = {id(d) for d in matches}
+        keep = [d for d in docs if id(d) not in match_ids]
         removed = len(docs) - len(keep)
         self._data[collection] = keep
         return removed
@@ -130,12 +154,23 @@ class MemoryStore:
     def snapshot(self) -> dict[str, list[dict]]:
         """Order-insensitive, serializable picture of the whole store.
 
-        Used by the experiments to compare final states between systems.
+        `_id` values are stripped so the experiments can compare final states
+        between systems without depending on id-assignment order.
         """
         return {
             name: sorted(
-                (dict(doc) for doc in docs),
+                self._strip_ids(docs),
                 key=lambda d: json.dumps(d, sort_keys=True),
+            )
+            for name, docs in sorted(self._data.items())
+        }
+
+    def records_with_ids(self) -> dict[str, list[dict]]:
+        """Docs WITH their unique `_id`, ordered by id — for display only."""
+        return {
+            name: sorted(
+                (dict(doc) for doc in docs),
+                key=lambda d: d.get("_id", 0),
             )
             for name, docs in sorted(self._data.items())
         }
@@ -161,8 +196,17 @@ class MongoStore:
             self._db[collection].insert_many(documents)
         return len(documents)
 
-    def delete_many(self, collection: str, filter: dict[str, Any] | None) -> int:
-        return self._db[collection].delete_many(filter or {}).deleted_count
+    def delete_many(
+        self,
+        collection: str,
+        filter: dict[str, Any] | None,
+        limit: int | None = None,
+    ) -> int:
+        coll = self._db[collection]
+        if limit is None:
+            return coll.delete_many(filter or {}).deleted_count
+        ids = [d["_id"] for d in coll.find(filter or {}, {"_id": 1}).limit(limit)]
+        return coll.delete_many({"_id": {"$in": ids}}).deleted_count
 
     def update_many(
         self, collection: str, filter: dict[str, Any] | None, updates: dict[str, Any]
@@ -210,7 +254,7 @@ def execute_plan(plan: CompiledPlan, store: Store) -> dict[str, Any]:
                 {"action": "find", "collection": step.collection, "matched": len(docs)}
             )
         elif action == "delete_many":
-            n = store.delete_many(step.collection, step.filter)
+            n = store.delete_many(step.collection, step.filter, step.limit)
             log.append(
                 {"action": "delete_many", "collection": step.collection, "removed": n}
             )

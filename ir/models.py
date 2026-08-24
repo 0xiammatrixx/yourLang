@@ -70,11 +70,14 @@ class RemoveOperation(BaseOperation):
     """Remove matching records from a collection.
 
     Example: "Remove everyone younger than 18 from people."
+    `limit` (optional) caps how many matching records are removed;
+    "delete any row" is `remove` with `condition: null, limit: 1`.
     """
 
     operation: Literal["remove"]
     source: str
     condition: Condition | None = None
+    limit: int | None = Field(default=None, ge=1)
 
 
 class MoveOperation(BaseOperation):

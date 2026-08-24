@@ -26,16 +26,19 @@ def _fields(docs: list[dict]) -> list[str]:
         for key in doc:
             if key not in keys:
                 keys.append(key)
+    if "_id" in keys:
+        keys.remove("_id")
+        keys.insert(0, "_id")
     return keys
 
 
 @app.get("/")
 def index():
-    snapshot = store.snapshot()
-    fields = {name: _fields(docs) for name, docs in snapshot.items()}
+    records = store.records_with_ids()
+    fields = {name: _fields(docs) for name, docs in records.items()}
     return render_template(
         "index.html",
-        collections=snapshot,
+        collections=records,
         fields=fields,
         last=state.get("last"),
         pending=state.get("pending"),

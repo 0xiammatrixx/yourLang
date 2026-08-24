@@ -179,3 +179,23 @@ def test_snapshot_is_deterministic_and_serializable():
     import json as _json
 
     _json.dumps(snap)
+
+
+def test_records_get_unique_ids_and_ids_are_stripped_from_results():
+    store = MemoryStore({"employees": []})
+    store.insert_many("employees", [{"name": "A"}, {"name": "A"}])
+    records = store.records_with_ids()["employees"]
+    assert len(records) == 2
+    ids = [r["_id"] for r in records]
+    assert len(set(ids)) == 2
+    # find() and snapshot() strip _id so experiments compare clean data
+    assert all("_id" not in d for d in store.find("employees", None))
+    assert all("_id" not in d for d in store.snapshot()["employees"])
+
+
+def test_delete_any_removes_one_arbitrary_record():
+    store = MemoryStore({"employees": []})
+    store.insert_many("employees", [{"name": "A"}, {"name": "A"}, {"name": "A"}])
+    removed = store.delete_many("employees", None, limit=1)
+    assert removed == 1
+    assert len(store.find("employees", None)) == 2

@@ -56,10 +56,17 @@ Rules:
    "above/more than/over/exceeds" -> ">", "at least" -> ">=",
    "below/less than/under" -> "<", "at most" -> "<=",
    "equals/is" -> "=", "not equal" -> "!=".
+   When your question requires the user to choose a collection or field, NAME
+   the available options so they can pick without prior knowledge: collections
+   are "people", "employees", "pension"; fields of "people" are name, age,
+   country, salary, status.
 4. Scope: if the instruction explicitly says all/everyone/everybody/everything
    with no other criterion, set "condition" to null to match ALL records. If no
    quantifier and no condition is given (e.g. "move people to pension"), the
    scope is unclear — use "needs_confirmation" or "needs_clarification".
+   "delete/remove any (one) record/row" or "delete a random/arbitrary record"
+   with no other criterion means: remove with condition null and limit 1
+   (delete exactly one arbitrary record).
 5. Verb → operation: "copy/add/put/duplicate … without deleting or removing
    from the source" maps to "copy" (the source is left unchanged).
    "move/transfer" maps to "move" (source records are deleted). Never treat the

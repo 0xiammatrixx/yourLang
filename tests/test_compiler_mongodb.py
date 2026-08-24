@@ -56,6 +56,15 @@ def test_copy_all_compiles_with_empty_filter():
     assert plan.steps[0].filter == {}
 
 
+def test_remove_with_limit_compiles():
+    plan = compile_operation(
+        command({"operation": "remove", "source": "people", "limit": 1})
+    )
+    assert plan.steps[0].action == "delete_many"
+    assert plan.steps[0].limit == 1
+    assert plan.steps[0].filter == {}
+
+
 def test_move_compiles_to_three_steps():
     plan = compile_operation(command(MOVE))
     assert len(plan.steps) == 3

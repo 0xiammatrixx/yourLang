@@ -54,6 +54,7 @@ class Step:
     documents: Any = None  # literal list of records, or {"$ref": "store"}
     updates: dict[str, Any] | None = None
     store: str | None = None  # when action == "find": where to keep matches
+    limit: int | None = None  # cap on how many records a delete removes
 
 
 @dataclass
@@ -111,6 +112,7 @@ def compile_operation(command: Operation) -> CompiledPlan:
                     "delete_many",
                     command.source,
                     filter=condition_to_filter(command.condition),
+                    limit=command.limit,
                 )
             ]
         )

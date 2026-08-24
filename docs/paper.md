@@ -62,7 +62,9 @@ flowchart LR
   `TranslationResult` with states `complete` | `needs_clarification` |
   `needs_confirmation`. `condition` is optional; `null` means **match all
   records** — how "everybody"/"all" is represented — and compiles to an empty
-  MongoDB filter `{}`.
+  MongoDB filter `{}`. `remove` also takes an optional `limit` ("delete any
+  one record"). Records carry a unique `_id`, shown in the GUI, so identical
+  rows remain addressable.
 - **Translator:** JSON output mode, JSON Schema embedded in the system prompt,
   one-shot corrective retry, tolerant parsing of a stray trailing token,
   temperature 0. The prompt carries **no dictionary of word meanings**: the
@@ -163,6 +165,13 @@ failure modes:
 3. **Multilingual input requires no extra machinery.** A French sentence maps
    to the same IR as its English equivalent, because the model translates
    meaning, not tokens.
+
+4. **Identity and domain disclosure.** Identical rows were unaddressable
+   (records had no id), and non-technical users could not know the domain
+   vocabulary. Fix: records get unique `_id`s (visible in the GUI); "delete any
+   row" is `remove` with `condition: null, limit: 1`; and clarification
+   questions now name the available collections and fields instead of assuming
+   the user knows them.
 
 ## 7. Discussion
 

@@ -137,3 +137,24 @@ def test_condition_is_optional_for_all_records():
         }
     )
     assert result.command.condition is None
+
+
+def test_remove_limit_parses_and_validates():
+    result = TranslationResult.model_validate(
+        {
+            "status": "complete",
+            "command": {
+                "operation": "remove",
+                "source": "people",
+                "limit": 1,
+            },
+        }
+    )
+    assert result.command.limit == 1
+    with pytest.raises(ValidationError):
+        TranslationResult.model_validate(
+            {
+                "status": "complete",
+                "command": {"operation": "remove", "source": "people", "limit": 0},
+            }
+        )
