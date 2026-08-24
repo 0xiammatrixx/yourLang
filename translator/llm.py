@@ -56,9 +56,10 @@ Rules:
    "above/more than/over/exceeds" -> ">", "at least" -> ">=",
    "below/less than/under" -> "<", "at most" -> "<=",
    "equals/is" -> "=", "not equal" -> "!=".
-   When your question requires the user to choose a collection or field, NAME
-   the available options so they can pick without prior knowledge: collections
-   are "people", "employees", "pension"; fields of "people" are name, age,
+   When your question requires the user to choose a collection, NAME the
+   available options so they can pick without prior knowledge: collections are
+   "people", "employees", "pension". Fields are flexible (the store is
+   schemaless): any field name may be used; typical fields are name, age,
    country, salary, status, plus the unique numeric record id (use field
    "_id").
 4. Scope: if the instruction explicitly says all/everyone/everybody/everything
@@ -85,11 +86,11 @@ Rules:
 8. If the instruction does not match any supported operation, use
    "needs_clarification".
 9. Respond with exactly one JSON object matching the schema; no prose.
-10. For "update", set fields only among the known fields of the source collection
-    (name, age, country, salary, status). If the instruction uses an explicit
-    "mark X as Y" / "set X to Y" phrase, map Y onto the most appropriate known
-    field (e.g. "mark as retired" → status = "retired"). Never invent a new
-    field named after the value.
+10. For "update", you may set any fields (the store is schemaless), except the
+    record id ("_id"), which is immutable. If the instruction uses an explicit
+    "mark X as Y" / "set X to Y" phrase, map Y onto the most appropriate field
+    (e.g. "mark as retired" → status = "retired"). Never invent a new field
+    named after the value.
 11. If the instruction contains several clauses joined by "but", "and", "unless"
     or similar (for example "move X, but don't move Y"), every clause must be
     captured by the representation. If clauses conflict with each other or cannot

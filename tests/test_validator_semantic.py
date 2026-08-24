@@ -96,28 +96,28 @@ def test_unknown_destination_rejected():
         validate(command({**MOVE, "destination": "banana"}))
 
 
-def test_unknown_field_rejected():
-    with pytest.raises(SemanticError):
-        validate(
-            command(
-                {
-                    **MOVE,
-                    "condition": {"field": "hair", "operator": ">", "value": 60},
-                }
-            )
+def test_arbitrary_condition_field_is_allowed():
+    # Fields are schemaless, so any condition field is accepted.
+    validate(
+        command(
+            {
+                **MOVE,
+                "condition": {"field": "hair", "operator": ">", "value": 60},
+            }
         )
+    )
 
 
-def test_wrong_value_type_rejected():
-    with pytest.raises(SemanticError):
-        validate(
-            command(
-                {
-                    **MOVE,
-                    "condition": {"field": "age", "operator": ">", "value": "sixty"},
-                }
-            )
+def test_condition_value_type_is_not_enforced():
+    # Schemaless: value types are not checked against a fixed schema.
+    validate(
+        command(
+            {
+                **MOVE,
+                "condition": {"field": "age", "operator": ">", "value": "sixty"},
+            }
         )
+    )
 
 
 def test_same_source_and_destination_rejected():
@@ -163,17 +163,17 @@ def test_add_known_record_ok():
     )
 
 
-def test_add_unknown_field_rejected():
-    with pytest.raises(SemanticError):
-        validate(
-            command(
-                {
-                    "operation": "add",
-                    "destination": "employees",
-                    "records": [{"pet": "cat"}],
-                }
-            )
+def test_add_arbitrary_fields_allowed():
+    # Schemaless: records may carry any fields.
+    validate(
+        command(
+            {
+                "operation": "add",
+                "destination": "employees",
+                "records": [{"pet": "cat", "salary": 50000}],
+            }
         )
+    )
 
 
 def test_update_set_ok():
@@ -189,29 +189,29 @@ def test_update_set_ok():
     )
 
 
-def test_update_set_unknown_field_rejected():
-    with pytest.raises(SemanticError):
-        validate(
-            command(
-                {
-                    "operation": "update",
-                    "source": "people",
-                    "condition": {"field": "age", "operator": ">=", "value": 60},
-                    "set": {"pets": "retired"},
-                }
-            )
+def test_update_set_arbitrary_fields_allowed():
+    # Schemaless: any field may be set.
+    validate(
+        command(
+            {
+                "operation": "update",
+                "source": "people",
+                "condition": {"field": "age", "operator": ">=", "value": 60},
+                "set": {"pets": "retired"},
+            }
         )
+    )
 
 
-def test_update_set_wrong_type_rejected():
-    with pytest.raises(SemanticError):
-        validate(
-            command(
-                {
-                    "operation": "update",
-                    "source": "people",
-                    "condition": {"field": "age", "operator": ">=", "value": 60},
-                    "set": {"salary": "a lot"},
-                }
-            )
+def test_update_set_any_value_type_allowed():
+    # Schemaless: value types are not checked against a fixed schema.
+    validate(
+        command(
+            {
+                "operation": "update",
+                "source": "people",
+                "condition": {"field": "age", "operator": ">=", "value": 60},
+                "set": {"salary": "a lot"},
+            }
         )
+    )

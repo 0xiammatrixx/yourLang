@@ -42,9 +42,9 @@ represented. (A null condition compiles to an empty MongoDB filter `{}`.)
 
 | Field | Type | Domain |
 |---|---|---|
-| `field` | `str` | a known field of the source collection; `_id` (or `id`) references the unique numeric record id |
+| `field` | `str` | any field name (schemaless); `_id` (or `id`) references the unique numeric record id |
 | `operator` | enum | `=` `!=` `>` `<` `>=` `<=` |
-| `value` | `int \| float \| str` | type must match the field's declared type (a whole number for `_id`) |
+| `value` | `int \| float \| str` | any scalar; a whole number when `field` is `_id` |
 
 ## `ClarificationRequest`
 

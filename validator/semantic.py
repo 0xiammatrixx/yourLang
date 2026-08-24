@@ -4,10 +4,12 @@ Structural validation (shape) is handled by the Pydantic models. This module
 checks that a well-shaped command is also meaningful in this domain:
 
 - collections must be known,
-- condition/set/record fields must exist on the relevant collection,
-- values must match the declared field types,
+- the record id (`_id`) is immutable and must be a whole number,
 - move/copy must not use the same collection for source and destination,
 - create must use a syntactically valid, not-yet-existing collection name.
+
+Fields are SCHEMALESS (like MongoDB): any record may carry any fields, so the
+validator does not restrict field names or value types.
 """
 
 import re
@@ -29,7 +31,8 @@ class SemanticError(ValueError):
     """The command is well-shaped but not meaningful in this domain."""
 
 
-# Static domain knowledge for version 0.1.
+# Known collections and their TYPICAL fields (informational only — fields are
+# schemaless and are not enforced).
 COLLECTION_SCHEMA: dict[str, dict[str, type]] = {
     "people": {
         "name": str,
@@ -60,31 +63,11 @@ def known_collections() -> tuple[str, ...]:
     return tuple(COLLECTION_SCHEMA)
 
 
-def _type_matches(value: Any, field_type: type) -> bool:
-    if field_type in (int, float):
-        return isinstance(value, (int, float)) and not isinstance(value, bool)
-    return isinstance(value, field_type)
-
-
 def _check_known(name: str, role: str) -> None:
     if name not in COLLECTION_SCHEMA:
         raise SemanticError(
             f"Unknown {role} collection '{name}'. "
             f"Known collections: {', '.join(sorted(COLLECTION_SCHEMA))}."
-        )
-
-
-def _check_field_value(collection: str, field: str, value: Any) -> None:
-    schema = COLLECTION_SCHEMA[collection]
-    if field not in schema:
-        raise SemanticError(
-            f"Unknown field '{field}' in collection '{collection}'. "
-            f"Known fields: {', '.join(schema)}."
-        )
-    if not _type_matches(value, schema[field]):
-        raise SemanticError(
-            f"Value {value!r} for field '{field}' must be of type "
-            f"{schema[field].__name__}."
         )
 
 
@@ -97,18 +80,19 @@ def _check_condition(collection: str, condition: Any) -> None:
                 f"Record id must be a whole number, got {condition.value!r}."
             )
         return
-    _check_field_value(collection, condition.field, condition.value)
+    # schemaless: any other field is allowed
 
 
 def _check_records(collection: str, records: list[dict[str, Any]]) -> None:
-    for record in records:
-        for field, value in record.items():
-            _check_field_value(collection, field, value)
+    # Schemaless: records may carry any fields (any incoming `_id` is ignored
+    # by the runtime, which assigns the id).
+    return
 
 
 def _check_updates(collection: str, updates: dict[str, Any]) -> None:
-    for field, value in updates.items():
-        _check_field_value(collection, field, value)
+    # The record id is immutable, like MongoDB's `_id`; everything else may be set.
+    if "_id" in updates or "id" in updates:
+        raise SemanticError("The record id is immutable and cannot be updated.")
 
 
 def _check_collection_name(name: str) -> None:

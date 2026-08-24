@@ -73,8 +73,9 @@ flowchart LR
   model infers meaning from context (in any natural language) and requests
   confirmation when a word has multiple plausible readings.
 - **Validator:** structural (Pydantic, `extra=forbid`, discriminated union) +
-  semantic (`validator/semantic.py`: known collections, known fields, value
-  types, source ≠ destination, name syntax).
+  semantic (`validator/semantic.py`: known collections, immutable record id,
+  source ≠ destination, name syntax). Fields are schemaless, matching
+  MongoDB's document model.
 - **Compiler:** IR → ordered plan of primitive MongoDB steps; `move` = find +
   delete_many + insert_many with a `{"$ref"}` data dependency.
 - **Runtime:** `MemoryStore` (deterministic, used by all experiments) and

@@ -25,12 +25,15 @@ Catches *meaning* errors that are still structurally valid:
 |---|---|---|
 | Unknown source collection | `source: "users"` (alias not mapped) | rejected |
 | Unknown destination collection | `destination: "moon"` | rejected |
-| Unknown condition field | `field: "hair"` on `people` | rejected |
-| Value type vs field type | `age > "sixty"` | rejected |
+| Immutable record id | `update … set: {"_id": 99}` | rejected |
+| Non-numeric record id | `condition: _id = "1"` | rejected |
 | Same source and destination | `people → people` | rejected |
 | Invalid collection name | `create "2 fast"` | rejected |
 | Duplicate collection | `create "people"` (exists) | rejected |
-| Unknown `set`/record field | `set: {"pets": …}` | rejected |
+
+Fields are **schemaless** (matching MongoDB's document model): any field name
+or value type is accepted, so there is no "unknown field" rejection. This was a
+deliberate relaxation from an earlier fixed-schema prototype.
 
 ## Layer 2 — semantic reviewer (LLM #2, `experiments/review.py`)
 
