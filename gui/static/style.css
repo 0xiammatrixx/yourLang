@@ -27,12 +27,16 @@ button:hover { background: #1f55b8; }
   padding: 0.75rem;
   margin: 1rem 0;
 }
+.confirm-row { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+button.secondary { background: #52606d; }
+button.secondary:hover { background: #3e4c59; }
 
 .outcome { margin: 1rem 0; padding: 0.75rem; border-radius: 4px; }
 .status-executed { background: #e6f7e6; border: 1px solid #7cc47c; }
 .status-needs_clarification { background: #fff7e0; border: 1px solid #f0c75e; }
 .status-invalid { background: #fde8e8; border: 1px solid #e67c7c; }
 .status-error { background: #fde8e8; border: 1px solid #e67c7c; }
+.status-needs_confirmation { background: #e8f0fe; border: 1px solid #8ab4f8; }
 .badge { font-weight: bold; text-transform: uppercase; font-size: 0.85em; }
 
 pre {

@@ -24,6 +24,16 @@ def clarifying(message: str) -> TranslationResult:
     )
 
 
+def confirming(command: dict, message: str) -> TranslationResult:
+    return TranslationResult.model_validate(
+        {
+            "status": "needs_confirmation",
+            "command": command,
+            "clarification": {"message": message, "missing": ["condition.value"]},
+        }
+    )
+
+
 class FakeTranslator:
     def __init__(self, responses):
         self.responses = list(responses)
@@ -75,3 +85,15 @@ def test_semantic_error_reported_as_invalid():
     outcome = run_web(fake, store, state, "Move people from banana to pension.")
     assert outcome["status"] == "invalid"
     assert "banana" in outcome["error"]
+
+
+def test_confirmation_yes_executes():
+    store = new_store()
+    state = {"pending": None}
+    fake = FakeTranslator([confirming(MOVE, "Did you mean: move over 60 to pension?")])
+    out1 = run_web(fake, store, state, "Move all the seniors to pension.")
+    assert out1["status"] == "needs_confirmation"
+    assert state["pending"]["kind"] == "confirm"
+    out2 = run_web(fake, store, state, "Move all the seniors to pension.", answer="yes")
+    assert out2["status"] == "executed"
+    assert len(store.find("pension", None)) == 2

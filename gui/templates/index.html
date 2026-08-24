@@ -14,14 +14,32 @@
   </form>
 
   {% if pending %}
-  <div class="clarify">
-    <strong>Clarification needed:</strong> {{ pending.question }}
-    <form method="post" action="/execute">
-      <input type="hidden" name="instruction" value="{{ pending.instruction }}">
-      <input name="answer" placeholder="Your answer" autofocus size="40">
-      <button type="submit">Answer</button>
-    </form>
-  </div>
+    {% if pending.kind == 'confirm' %}
+    <div class="clarify">
+      <strong>Confirm?</strong> {{ pending.question }}
+      <div class="confirm-row">
+        <form method="post" action="/execute">
+          <input type="hidden" name="instruction" value="{{ pending.instruction }}">
+          <input type="hidden" name="answer" value="yes">
+          <button type="submit">Yes, that's right</button>
+        </form>
+        <form method="post" action="/execute">
+          <input type="hidden" name="instruction" value="{{ pending.instruction }}">
+          <input type="hidden" name="answer" value="no">
+          <button type="submit" class="secondary">No</button>
+        </form>
+      </div>
+    </div>
+    {% else %}
+    <div class="clarify">
+      <strong>Clarification needed:</strong> {{ pending.question }}
+      <form method="post" action="/execute">
+        <input type="hidden" name="instruction" value="{{ pending.instruction }}">
+        <input name="answer" placeholder="Your answer" autofocus size="40">
+        <button type="submit">Answer</button>
+      </form>
+    </div>
+    {% endif %}
   {% endif %}
 
   {% if last %}

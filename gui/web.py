@@ -21,6 +21,28 @@ def new_store() -> MemoryStore:
     return seed_demo_store()
 
 
+def _execute(instruction: str, command: Any, store: MemoryStore) -> dict[str, Any]:
+    """Validate, compile, and execute a command."""
+    try:
+        validate(command)  # semantic (domain) rules
+    except SemanticError as exc:
+        return {
+            "status": "invalid",
+            "instruction": instruction,
+            "ir": command.model_dump(),
+            "error": f"Semantic validation failed: {exc}",
+        }
+    plan = compile_operation(command)
+    execution = execute_plan(plan, store)
+    return {
+        "status": "executed",
+        "instruction": instruction,
+        "ir": command.model_dump(),
+        "plan": plan.to_dict(),
+        "execution": execution,
+    }
+
+
 def run_web(
     translator: Any,
     store: MemoryStore,
@@ -28,18 +50,32 @@ def run_web(
     instruction: str,
     answer: str | None = None,
 ) -> dict[str, Any]:
-    """Run one instruction; state['pending'] tracks clarification flows.
-
-    Returns an outcome dict with the same shape as main.process_instruction.
-    """
+    """Run one instruction; state['pending'] tracks clarification/confirmation."""
     instruction = (instruction or "").strip()
+    pending = state.get("pending")
+
+    # An answer to a previous "did you mean …?" confirmation.
+    if pending and pending.get("kind") == "confirm" and answer:
+        state["pending"] = None
+        if answer.strip().lower() in ("yes", "y"):
+            command = TranslationResult.model_validate(
+                {"status": "complete", "command": pending["command"]}
+            ).command
+            return _execute(pending["instruction"], command, store)
+        return {
+            "status": "needs_confirmation",
+            "instruction": pending["instruction"],
+            "clarification": {
+                "message": "Not confirmed. Please rephrase or give more detail.",
+                "missing": [],
+            },
+        }
+
     if not instruction:
         return {"status": "error", "error": "No instruction given."}
 
-    # If the previous step asked a question and the user just answered it,
-    # combine the answer with the original instruction and re-translate.
-    if state.get("pending") and answer:
-        pending = state["pending"]
+    # An answer to a previous open clarification.
+    if pending and pending.get("kind") == "clarify" and answer:
         state["pending"] = None
         instruction = _follow_up(pending["instruction"], pending["question"], answer)
 
@@ -51,6 +87,7 @@ def run_web(
     if result.status == "needs_clarification":
         clarification = result.clarification
         state["pending"] = {
+            "kind": "clarify",
             "instruction": instruction,
             "question": clarification.message,
             "missing": clarification.missing,
@@ -64,23 +101,23 @@ def run_web(
             },
         }
 
-    command = result.command
-    try:
-        validate(command)  # semantic (domain) rules
-    except SemanticError as exc:
+    if result.status == "needs_confirmation":
+        clarification = result.clarification
+        command = result.command
+        state["pending"] = {
+            "kind": "confirm",
+            "instruction": instruction,
+            "question": clarification.message,
+            "command": command.model_dump(),
+        }
         return {
-            "status": "invalid",
+            "status": "needs_confirmation",
             "instruction": instruction,
             "ir": command.model_dump(),
-            "error": f"Semantic validation failed: {exc}",
+            "clarification": {
+                "message": clarification.message,
+                "missing": clarification.missing,
+            },
         }
 
-    plan = compile_operation(command)
-    execution = execute_plan(plan, store)
-    return {
-        "status": "executed",
-        "instruction": instruction,
-        "ir": command.model_dump(),
-        "plan": plan.to_dict(),
-        "execution": execution,
-    }
+    return _execute(instruction, result.command, store)

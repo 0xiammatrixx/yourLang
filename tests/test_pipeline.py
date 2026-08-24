@@ -25,6 +25,16 @@ def clarifying(message: str) -> TranslationResult:
     )
 
 
+def confirming(command: dict, message: str) -> TranslationResult:
+    return TranslationResult.model_validate(
+        {
+            "status": "needs_confirmation",
+            "command": command,
+            "clarification": {"message": message, "missing": ["condition.value"]},
+        }
+    )
+
+
 class FakeTranslator:
     """Returns scripted responses; records every call."""
 
@@ -111,3 +121,24 @@ def test_max_rounds_reached():
     )
     assert outcome["status"] == "needs_clarification"
     assert "2 clarification rounds" in outcome["error"]
+
+
+def test_confirmation_yes_executes():
+    store = seed_demo_store()
+    fake = FakeTranslator([confirming(MOVE, "Did you mean: move over 60 to pension?")])
+    outcome = process_instruction(
+        "Move all the seniors to pension.", fake, store, confirm_fn=lambda q: True
+    )
+    assert outcome["status"] == "executed"
+    assert len(store.find("pension", None)) == 2
+
+
+def test_confirmation_no_stops():
+    store = seed_demo_store()
+    fake = FakeTranslator([confirming(MOVE, "Did you mean: move over 60 to pension?")])
+    outcome = process_instruction(
+        "Move all the seniors to pension.", fake, store, confirm_fn=lambda q: False
+    )
+    assert outcome["status"] == "needs_confirmation"
+    assert "Not confirmed" in outcome["error"]
+    assert len(store.find("pension", None)) == 0

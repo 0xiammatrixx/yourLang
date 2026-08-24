@@ -10,13 +10,15 @@ Every LLM response must match exactly one of two states:
 
 | Field | Type | Notes |
 |---|---|---|
-| `status` | `"complete" \| "needs_clarification"` | discriminates the payload |
-| `command` | `Operation \| null` | required iff `status == "complete"` |
-| `clarification` | `ClarificationRequest \| null` | required iff `status == "needs_clarification"` |
+| `status` | `"complete" \| "needs_clarification" \| "needs_confirmation"` | discriminates the payload |
+| `command` | `Operation \| null` | required iff `status == "complete"` or `"needs_confirmation"` |
+| `clarification` | `ClarificationRequest \| null` | required iff `status == "needs_clarification"` or `"needs_confirmation"` |
 
 Invariants (enforced by a model validator):
 - `complete` ⇒ `command` present, `clarification` absent
 - `needs_clarification` ⇒ `clarification` present, `command` absent
+- `needs_confirmation` ⇒ BOTH `command` (best guess) and `clarification` (the
+  "did you mean …?" question) present
 
 ## Operations (discriminated union on `operation`)
 

@@ -75,6 +75,21 @@ def test_needs_clarification_without_clarification_rejected():
         TranslationResult.model_validate({"status": "needs_clarification"})
 
 
+def test_needs_confirmation_parses_and_requires_both():
+    ok = TranslationResult.model_validate(
+        {
+            "status": "needs_confirmation",
+            "command": MOVE_IR,
+            "clarification": {"message": "Did you mean this?", "missing": []},
+        }
+    )
+    assert ok.status == "needs_confirmation"
+    assert ok.command.operation == "move"
+
+    with pytest.raises(ValidationError):
+        TranslationResult.model_validate({"status": "needs_confirmation", "command": MOVE_IR})
+
+
 def test_find_and_update_operations():
     find = TranslationResult.model_validate(
         {

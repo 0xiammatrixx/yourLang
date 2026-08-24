@@ -67,11 +67,47 @@ def _outcome(
     }
 
 
+def _execute_command(
+    instruction: str, command: Any, store: Store, rounds: int
+) -> dict[str, Any]:
+    """Validate, compile, and execute a (possibly LLM-proposed) command."""
+    try:
+        validate(command)  # semantic (domain) rules
+    except SemanticError as exc:
+        return _outcome(
+            "invalid",
+            instruction,
+            rounds=rounds,
+            ir=command.model_dump(),
+            error=f"Semantic validation failed: {exc}",
+        )
+    try:
+        plan = compile_operation(command)
+        execution = execute_plan(plan, store)
+    except StoreError as exc:
+        return _outcome(
+            "error",
+            instruction,
+            rounds=rounds,
+            ir=command.model_dump(),
+            error=f"Execution failed: {exc}",
+        )
+    return _outcome(
+        "executed",
+        instruction,
+        rounds=rounds,
+        ir=command.model_dump(),
+        plan=plan.to_dict(),
+        execution=execution,
+    )
+
+
 def process_instruction(
     instruction: str,
     translator: Any,
     store: Store,
     clarify_fn: Callable[[str], str | None] | None = None,
+    confirm_fn: Callable[[str], bool | None] | None = None,
     max_rounds: int = MAX_ROUNDS,
 ) -> dict[str, Any]:
     """Run one instruction through the whole pipeline.
@@ -79,6 +115,7 @@ def process_instruction(
     Returns an outcome dict with one of these statuses:
     - "executed"             translation → validation → compilation → execution
     - "needs_clarification"  the LLM asked a question (and got no usable answer)
+    - "needs_confirmation"   the LLM proposed a guess and asked the user to confirm
     - "invalid"              structurally fine but semantically rejected
     - "error"                translation or execution failed
     """
@@ -125,38 +162,40 @@ def process_instruction(
             current = _follow_up(current, clarification.message, answer)
             continue
 
-        command = result.command
-        try:
-            validate(command)  # semantic (domain) rules
-        except SemanticError as exc:
+        if result.status == "needs_confirmation":
+            clarification = result.clarification
+            command = result.command
+            details = {
+                "message": clarification.message if clarification else "",
+                "missing": clarification.missing if clarification else [],
+            }
+            if confirm_fn is None:
+                return _outcome(
+                    "needs_confirmation",
+                    instruction,
+                    rounds=rounds,
+                    ir=command.model_dump(),
+                    clarification=details,
+                )
+            answer = confirm_fn(details["message"])
+            if answer is True:
+                return _execute_command(instruction, command, store, rounds)
+            # Not confirmed — ask for more detail, or stop.
+            if clarify_fn is not None:
+                fixed = clarify_fn(details["message"])
+                if fixed:
+                    current = _follow_up(current, details["message"], fixed)
+                    continue
             return _outcome(
-                "invalid",
+                "needs_confirmation",
                 instruction,
                 rounds=rounds,
                 ir=command.model_dump(),
-                error=f"Semantic validation failed: {exc}",
+                clarification=details,
+                error="Not confirmed by the user.",
             )
 
-        try:
-            plan = compile_operation(command)
-            execution = execute_plan(plan, store)
-        except StoreError as exc:
-            return _outcome(
-                "error",
-                instruction,
-                rounds=rounds,
-                ir=command.model_dump(),
-                error=f"Execution failed: {exc}",
-            )
-
-        return _outcome(
-            "executed",
-            instruction,
-            rounds=rounds,
-            ir=command.model_dump(),
-            plan=plan.to_dict(),
-            execution=execution,
-        )
+        return _execute_command(instruction, result.command, store, rounds)
 
     return _outcome(
         "needs_clarification",
@@ -172,6 +211,18 @@ def _interactive_clarify(question: str) -> str | None:
     except EOFError:
         return None
     return answer or None
+
+
+def _interactive_confirm(question: str) -> bool | None:
+    try:
+        answer = input(f"   ? {question}\n   [y/n]: ").strip().lower()
+    except EOFError:
+        return None
+    if answer in ("y", "yes"):
+        return True
+    if answer in ("n", "no"):
+        return False
+    return None
 
 
 def _print_outcome(outcome: dict[str, Any]) -> None:
@@ -197,7 +248,11 @@ def main() -> None:
         instruction = " ".join(sys.argv[1:])
         with Translator() as translator:
             outcome = process_instruction(
-                instruction, translator, store, clarify_fn=_interactive_clarify
+                instruction,
+                translator,
+                store,
+                clarify_fn=_interactive_clarify,
+                confirm_fn=_interactive_confirm,
             )
         print(json.dumps(outcome, indent=2))
         return
@@ -216,7 +271,11 @@ def main() -> None:
             if not instruction or instruction.lower() in {"quit", "exit"}:
                 break
             outcome = process_instruction(
-                instruction, translator, store, clarify_fn=_interactive_clarify
+                instruction,
+                translator,
+                store,
+                clarify_fn=_interactive_clarify,
+                confirm_fn=_interactive_confirm,
             )
             _print_outcome(outcome)
 

@@ -46,25 +46,32 @@ by the JSON Schema below.
 
 Rules:
 1. Never execute anything; you only produce JSON.
-2. Never invent missing information. If a required field cannot be determined from
-   the instruction (for example an ambiguous word such as "old"), set "status" to
-   "needs_clarification", give a short, precise question in "message", and list the
-   missing field names in "missing".
-3. Collections: the known collections are "people", "pension" and "employees".
-   Generic words that refer to the people collection — "users", "everyone",
-   "everybody", "anyone", "anybody", "persons" — must be mapped to collection
-   "people", unless another collection is explicitly named. Map words to operators:
+2. The instruction may be written in any natural language (English, French,
+   Spanish, …). Translate its MEANING into the IR; IR field names, collection
+   names, and operator symbols stay in English.
+3. Infer collections from context. Generic words that refer to the people
+   collection — "users", "everyone", "everybody", "anyone", "anybody",
+   "persons", and similar — map to "people", unless another collection is
+   explicitly named. Map words to operators:
    "above/more than/over/exceeds" -> ">", "at least" -> ">=",
    "below/less than/under" -> "<", "at most" -> "<=",
    "equals/is" -> "=", "not equal" -> "!=".
-4. If the instruction does not match any supported operation, use
+4. If the instruction is ambiguous but you have a confident best guess, set
+   "status" to "needs_confirmation": return BOTH the best-guess "command" AND
+   a "clarification" whose "message" asks the user to confirm, for example
+   "Did you mean: move everyone aged above 60 to pension?". The system will
+   ask the user to confirm before executing anything.
+5. If a required field cannot be determined and you do NOT have a reasonable
+   guess (e.g. an undefined word such as "old"), set "status" to
+   "needs_clarification" and list the missing field names in "missing".
+6. If the instruction does not match any supported operation, use
    "needs_clarification".
-5. Respond with exactly one JSON object matching the schema; no prose.
-6. For "update", choose the field to change among the known fields of the source
+7. Respond with exactly one JSON object matching the schema; no prose.
+8. For "update", choose the field to change among the known fields of the source
    collection (name, age, country, salary, status). Phrases like "mark as retired"
    or "set to retired" mean: set the "status" field to the value "retired" —
    never invent a new field named after the value.
-7. If the instruction contains several clauses joined by "but", "and", "unless"
+9. If the instruction contains several clauses joined by "but", "and", "unless"
    or similar (for example "move X, but don't move Y"), every clause must be
    captured by the representation. If clauses conflict with each other or cannot
    all be represented, set "status" to "needs_clarification" and explain the
@@ -78,6 +85,11 @@ Response: {"status": "complete", "command": {"operation": "move", "source": "emp
 Instruction: "Remove all the heavy users."
 Response: {"status": "needs_clarification", "clarification": {"message": "What makes a
 user heavy?", "missing": ["condition.field", "condition.value"]}}
+
+Instruction: "Move all the seniors to pension."
+Response: {"status": "needs_confirmation", "command": {"operation": "move", "source": "people",
+"destination": "pension", "condition": {"field": "age", "operator": ">", "value": 60}},
+"clarification": {"message": "Did you mean: move everyone over 60 to pension?", "missing": ["condition.value"]}}
 
 JSON Schema:
 {schema}

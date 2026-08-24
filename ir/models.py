@@ -150,11 +150,12 @@ class ClarificationRequest(BaseModel):
 class TranslationResult(BaseModel):
     """Every LLM response must match this shape.
 
-    - status == "complete"          -> `command` is required
-    - status == "needs_clarification" -> `clarification` is required
+    - status == "complete"             -> `command` is required
+    - status == "needs_clarification"  -> `clarification` is required
+    - status == "needs_confirmation"   -> `command` AND `clarification` required
     """
 
-    status: Literal["complete", "needs_clarification"]
+    status: Literal["complete", "needs_clarification", "needs_confirmation"]
     command: Operation | None = None
     clarification: ClarificationRequest | None = None
 
@@ -165,5 +166,12 @@ class TranslationResult(BaseModel):
         if self.status == "needs_clarification" and self.clarification is None:
             raise ValueError(
                 "status 'needs_clarification' requires a 'clarification'"
+            )
+        if self.status == "needs_confirmation" and (
+            self.command is None or self.clarification is None
+        ):
+            raise ValueError(
+                "status 'needs_confirmation' requires both 'command' and "
+                "'clarification'"
             )
         return self

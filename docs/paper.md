@@ -41,6 +41,9 @@ flowchart LR
 - The LLM translates; it never executes; it cannot emit code.
 - Two-layer validation: Pydantic (shape) + domain rules (meaning).
 - Clarification loop grounded in missing IR fields (max 3 rounds).
+- Propose-then-confirm: ambiguous-but-guessable input returns a best-guess IR
+  and asks "did you mean …?" before executing; input in any natural language
+  (English, French, …) maps to the same IR.
 - Optional LLM #2 reviewer between validation and compilation.
 
 ## 5. Implementation
@@ -85,6 +88,11 @@ malformed JSON) was **caught by the validator — 0 wrong executions**.
 4 ambiguous instructions.
 **Result: 4/4 asked (0 guesses); 4/4 completed to the correct IR after one
 answer.** Questions named the missing IR field (e.g. `condition.value`).
+Guessable ambiguity uses propose-then-confirm instead: "Move all the seniors
+to pension." returns `needs_confirmation` with the best-guess IR
+(`age > 60 → pension`) and asks "Did you mean: move everyone over 60 to
+pension?" before executing. Multilingual input (e.g. French) maps to the same
+IR with no language-specific code.
 
 ### 6.3 Adversarial safety (H3)
 
