@@ -118,9 +118,10 @@ Notable findings (see `docs/paper.md` for the full evaluation):
   LLM output — only validated IRs are compiled by our own code.
 - **Any natural language in.** The LLM translates the *meaning*, so English,
   French, Spanish, … all map to the same IR; IR fields stay English.
-- **Propose-then-confirm.** When the instruction is ambiguous but guessable,
-  the system returns its best-guess IR and asks "did you mean …?" before
-  executing — it asks an open question only when it has no guess at all.
+- **Propose-then-confirm, on every ambiguous word.** When any word or phrase
+  could mean more than one thing (e.g. "retire"), the system returns its
+  best-guess IR and asks "did you mean X … or Y …?" before executing — word
+  meanings are inferred, never hardcoded into a dictionary.
 - **Two validation layers.** Pydantic checks shape; `validator/semantic.py`
   checks meaning (known collections, known fields, value types).
 - **Clarification instead of guessing.** Ambiguous input triggers a question

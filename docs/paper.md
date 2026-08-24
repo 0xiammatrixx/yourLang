@@ -41,9 +41,10 @@ flowchart LR
 - The LLM translates; it never executes; it cannot emit code.
 - Two-layer validation: Pydantic (shape) + domain rules (meaning).
 - Clarification loop grounded in missing IR fields (max 3 rounds).
-- Propose-then-confirm: ambiguous-but-guessable input returns a best-guess IR
-  and asks "did you mean …?" before executing; input in any natural language
-  (English, French, …) maps to the same IR.
+- Propose-then-confirm: any word with multiple plausible meanings triggers a
+  best-guess IR plus a "did you mean X … or Y …?" question before executing —
+  word meanings are inferred from context, not hardcoded; input in any natural
+  language (English, French, …) maps to the same IR.
 - Optional LLM #2 reviewer between validation and compilation.
 
 ## 5. Implementation

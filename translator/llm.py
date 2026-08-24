@@ -64,23 +64,24 @@ Rules:
    from the source" maps to "copy" (the source is left unchanged).
    "move/transfer" maps to "move" (source records are deleted). Never treat the
    phrase "without deleting" as a filter on a "deleted" status or field.
-6. If the instruction is ambiguous but you have a confident best guess, set
-   "status" to "needs_confirmation": return BOTH the best-guess "command" AND
-   a "clarification" whose "message" asks the user to confirm, for example
-   "Did you mean: move everyone aged above 60 to pension?". The system will
-   ask the user to confirm before executing anything.
+6. Ambiguity is the default, not the exception. If any word or phrase could be
+   interpreted in more than one way that changes the IR (for example "retire"
+   could mean set status to "retired", move records to "pension", or delete
+   them), do NOT silently pick one meaning. Set "status" to "needs_confirmation":
+   return your best-guess "command" AND a "clarification" whose "message" asks
+   the user to confirm while naming the alternative(s), e.g. "Did you mean: set
+   their status to retired? Or move them to pension?".
 7. If a required field cannot be determined and you do NOT have a reasonable
    guess (e.g. an undefined word such as "old"), set "status" to
    "needs_clarification" and list the missing field names in "missing".
 8. If the instruction does not match any supported operation, use
    "needs_clarification".
 9. Respond with exactly one JSON object matching the schema; no prose.
-10. For "update", choose the field to change among the known fields of the source
-    collection (name, age, country, salary, status). Verbs like "retire",
-    "mark as retired", "set to retired", or "deactivate" mean: set the "status"
-    field to the value "retired" (or "inactive" for "deactivate") — never invent
-    a new field named after the value, and never treat "retire" as a move,
-    delete, or copy into another collection.
+10. For "update", set fields only among the known fields of the source collection
+    (name, age, country, salary, status). If the instruction uses an explicit
+    "mark X as Y" / "set X to Y" phrase, map Y onto the most appropriate known
+    field (e.g. "mark as retired" → status = "retired"). Never invent a new
+    field named after the value.
 11. If the instruction contains several clauses joined by "but", "and", "unless"
     or similar (for example "move X, but don't move Y"), every clause must be
     captured by the representation. If clauses conflict with each other or cannot
@@ -104,6 +105,12 @@ Response: {"status": "needs_confirmation", "command": {"operation": "move", "sou
 Instruction: "Add everybody to the employees collection without deleting them from the previous collection."
 Response: {"status": "complete", "command": {"operation": "copy", "source": "people",
 "destination": "employees", "condition": null}}
+
+Instruction: "Retire everyone with a salary above 100000."
+Response: {"status": "needs_confirmation", "command": {"operation": "update", "source": "people",
+"condition": {"field": "salary", "operator": ">", "value": 100000},
+"set": {"status": "retired"}},
+"clarification": {"message": "Did you mean: set their status to retired? Or move them to pension?", "missing": []}}
 
 JSON Schema:
 {schema}
