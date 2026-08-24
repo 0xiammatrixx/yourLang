@@ -81,7 +81,7 @@ flowchart LR
   delete_many + insert_many with a `{"$ref"}` data dependency.
 - **Runtime:** `MemoryStore` (deterministic, used by all experiments) and
   `MongoStore` (pymongo) behind one interface.
-- 73 unit tests + 2 live integration tests (75 total).
+- 90 unit tests + 2 live integration tests (92 total).
 
 ## 6. Evaluation
 

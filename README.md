@@ -54,13 +54,13 @@ python3 -m venv .venv
 ```
 ir/            models.py + schema.py      # the IR: Pydantic models + JSON Schema
 translator/    llm.py                     # DeepSeek → IR (the ONLY LLM here)
-validator/     semantic.py                # domain rules: collections, fields, types
+validator/     semantic.py                # domain rules: record id, source≠destination, name syntax
 compiler/      mongodb.py                 # IR → MongoDB plan (pure code)
 runtime/       database.py                # MemoryStore / MongoStore + plan execution
 main.py                                    # pipeline + clarification loop
 experiments/   benchmark.py, run_*.py, direct.py, review.py
 experiments/data/                          # benchmark JSONs
-tests/                                      # 73 unit tests + 2 integration tests
+tests/                                      # 90 unit tests + 2 integration tests
 results/                                    # saved experiment results
 docs/                                       # research map, question, paper skeleton
 ```
@@ -79,6 +79,9 @@ the browser.
 - The page shows the last outcome: status, the IR, the MongoDB plan, and the
   execution log.
 - When clarification is needed, an answer box appears — reply to continue.
+  Ambiguous-but-guessable input shows a "Confirm?" panel with **Yes / No**
+  buttons; a missing collection offers to **create** it or suggests a likely
+  typo.
 - **Reset database** restores the seed collections (`people`, `employees`,
   `pension`).
 
@@ -123,7 +126,15 @@ Notable findings (see `docs/paper.md` for the full evaluation):
   best-guess IR and asks "did you mean X … or Y …?" before executing — word
   meanings are inferred, never hardcoded into a dictionary.
 - **Two validation layers.** Pydantic checks shape; `validator/semantic.py`
-  checks meaning (known collections, known fields, value types).
+  checks meaning (immutable record id, source ≠ destination, name syntax).
+- **Schemaless fields, like MongoDB.** Any record may carry any fields; only
+  the record `_id` is immutable.
+- **Multi-operation instructions.** A `command` may be an array, so "move
+  from people and pension" compiles to one plan.
+- **Identity.** Every record gets a unique `_id` (shown in the GUI), so
+  identical-looking rows are still addressable ("move id=1").
+- **Missing-collection recovery.** Operating on a collection that doesn't
+  exist offers to create it, or suggests the closest existing name for typos.
 - **Clarification instead of guessing.** Ambiguous input triggers a question
   loop (max 3 rounds) grounded in the missing IR fields.
 - **No LLM frameworks.** Plain `httpx` + Pydantic; no LangChain, agents, or RAG.
