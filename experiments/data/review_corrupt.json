@@ -1,0 +1,81 @@
+[
+  {
+    "id": "rev_off_by_one",
+    "instruction": "Move everyone aged at least 60 to pension.",
+    "ir": {
+      "operation": "move",
+      "source": "people",
+      "destination": "pension",
+      "condition": {"field": "age", "operator": ">", "value": 60}
+    }
+  },
+  {
+    "id": "rev_wrong_direction",
+    "instruction": "Move everyone over 60 out of pension back to people.",
+    "ir": {
+      "operation": "move",
+      "source": "people",
+      "destination": "pension",
+      "condition": {"field": "age", "operator": ">", "value": 60}
+    }
+  },
+  {
+    "id": "rev_wrong_verb",
+    "instruction": "Copy everyone over 60 to pension.",
+    "ir": {
+      "operation": "move",
+      "source": "people",
+      "destination": "pension",
+      "condition": {"field": "age", "operator": ">", "value": 60}
+    }
+  },
+  {
+    "id": "rev_wrong_operator",
+    "instruction": "Find people younger than 60.",
+    "ir": {
+      "operation": "find",
+      "source": "people",
+      "condition": {"field": "age", "operator": ">", "value": 60}
+    }
+  },
+  {
+    "id": "rev_wrong_field",
+    "instruction": "Retire everyone over 60.",
+    "ir": {
+      "operation": "update",
+      "source": "people",
+      "condition": {"field": "age", "operator": ">", "value": 60},
+      "set": {"salary": 100000}
+    }
+  },
+  {
+    "id": "rev_dropped_exception",
+    "instruction": "Move everyone over 60 to pension, except people named David.",
+    "ir": {
+      "operation": "move",
+      "source": "people",
+      "destination": "pension",
+      "condition": {"field": "age", "operator": ">", "value": 60}
+    }
+  },
+  {
+    "id": "rev_threshold_swap",
+    "instruction": "Mark everyone with salary below 50000 as junior.",
+    "ir": {
+      "operation": "update",
+      "source": "people",
+      "condition": {"field": "salary", "operator": ">", "value": 50000},
+      "set": {"status": "junior"}
+    }
+  },
+  {
+    "id": "rev_invented_threshold",
+    "instruction": "Move all the old people to pension.",
+    "ir": {
+      "operation": "move",
+      "source": "people",
+      "destination": "pension",
+      "condition": {"field": "age", "operator": ">", "value": 60}
+    }
+  }
+]

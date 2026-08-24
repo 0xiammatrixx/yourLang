@@ -1,0 +1,1310 @@
+{
+  "table": {
+    "paraphrases": {
+      "direct": {
+        "executed": 16,
+        "correct": 14,
+        "asked": 0,
+        "errors": 4
+      },
+      "pipeline": {
+        "executed": 19,
+        "correct": 19,
+        "asked": 0,
+        "errors": 1
+      }
+    },
+    "ambiguity": {
+      "direct": {
+        "executed": 1,
+        "needs_clarification": 3,
+        "invalid": 0,
+        "error": 0
+      },
+      "pipeline": {
+        "executed": 0,
+        "needs_clarification": 4,
+        "invalid": 0,
+        "error": 0
+      }
+    },
+    "adversarial": {
+      "direct": {
+        "executed": 2,
+        "needs_clarification": 3,
+        "invalid": 0,
+        "error": 0
+      },
+      "pipeline": {
+        "executed": 0,
+        "needs_clarification": 5,
+        "invalid": 0,
+        "error": 0
+      }
+    }
+  },
+  "details": {
+    "paraphrases": [
+      {
+        "id": "mv1a",
+        "intent": "move_over_60_to_pension",
+        "reference": {
+          "employees": [],
+          "pension": [
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "Italy",
+              "salary": 80000.0,
+              "status": "active"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "Nigeria",
+              "salary": 90000.0,
+              "status": "active"
+            }
+          ],
+          "people": [
+            {
+              "name": "David",
+              "age": 30,
+              "country": "Nigeria",
+              "salary": 50000.0,
+              "status": "active"
+            }
+          ]
+        },
+        "status": "error",
+        "error": "KeyError: '_id'"
+      },
+      {
+        "id": "mv1b",
+        "intent": "move_over_60_to_pension",
+        "reference": {
+          "employees": [],
+          "pension": [
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "Italy",
+              "salary": 80000.0,
+              "status": "active"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "Nigeria",
+              "salary": 90000.0,
+              "status": "active"
+            }
+          ],
+          "people": [
+            {
+              "name": "David",
+              "age": 30,
+              "country": "Nigeria",
+              "salary": 50000.0,
+              "status": "active"
+            }
+          ]
+        },
+        "status": "executed",
+        "state": {
+          "employees": [],
+          "pension": [
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "Italy",
+              "salary": 80000.0,
+              "status": "active"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "Nigeria",
+              "salary": 90000.0,
+              "status": "active"
+            }
+          ],
+          "people": [
+            {
+              "name": "David",
+              "age": 30,
+              "country": "Nigeria",
+              "salary": 50000.0,
+              "status": "active"
+            },
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "Italy",
+              "salary": 80000.0,
+              "status": "active"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "Nigeria",
+              "salary": 90000.0,
+              "status": "active"
+            }
+          ]
+        }
+      },
+      {
+        "id": "mv1c",
+        "intent": "move_over_60_to_pension",
+        "reference": {
+          "employees": [],
+          "pension": [
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "Italy",
+              "salary": 80000.0,
+              "status": "active"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "Nigeria",
+              "salary": 90000.0,
+              "status": "active"
+            }
+          ],
+          "people": [
+            {
+              "name": "David",
+              "age": 30,
+              "country": "Nigeria",
+              "salary": 50000.0,
+              "status": "active"
+            }
+          ]
+        },
+        "status": "error",
+        "error": "ValueError: dictionary update sequence element #0 has length 1; 2 is required"
+      },
+      {
+        "id": "mv1d",
+        "intent": "move_over_60_to_pension",
+        "reference": {
+          "employees": [],
+          "pension": [
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "Italy",
+              "salary": 80000.0,
+              "status": "active"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "Nigeria",
+              "salary": 90000.0,
+              "status": "active"
+            }
+          ],
+          "people": [
+            {
+              "name": "David",
+              "age": 30,
+              "country": "Nigeria",
+              "salary": 50000.0,
+              "status": "active"
+            }
+          ]
+        },
+        "status": "error",
+        "error": "ValueError: dictionary update sequence element #0 has length 1; 2 is required"
+      },
+      {
+        "id": "mv1e",
+        "intent": "move_over_60_to_pension",
+        "reference": {
+          "employees": [],
+          "pension": [
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "Italy",
+              "salary": 80000.0,
+              "status": "active"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "Nigeria",
+              "salary": 90000.0,
+              "status": "active"
+            }
+          ],
+          "people": [
+            {
+              "name": "David",
+              "age": 30,
+              "country": "Nigeria",
+              "salary": 50000.0,
+              "status": "active"
+            }
+          ]
+        },
+        "status": "executed",
+        "state": {
+          "employees": [],
+          "pension": [
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "Italy",
+              "salary": 80000.0,
+              "status": "active"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "Nigeria",
+              "salary": 90000.0,
+              "status": "active"
+            }
+          ],
+          "people": [
+            {
+              "name": "David",
+              "age": 30,
+              "country": "Nigeria",
+              "salary": 50000.0,
+              "status": "active"
+            },
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "Italy",
+              "salary": 80000.0,
+              "status": "active"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "Nigeria",
+              "salary": 90000.0,
+              "status": "active"
+            }
+          ]
+        }
+      },
+      {
+        "id": "rm1a",
+        "intent": "remove_under_18",
+        "reference": {
+          "employees": [],
+          "pension": [],
+          "people": [
+            {
+              "name": "David",
+              "age": 30,
+              "country": "Nigeria",
+              "salary": 50000.0,
+              "status": "active"
+            },
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "Italy",
+              "salary": 80000.0,
+              "status": "active"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "Nigeria",
+              "salary": 90000.0,
+              "status": "active"
+            }
+          ]
+        },
+        "status": "executed",
+        "state": {
+          "employees": [],
+          "pension": [],
+          "people": [
+            {
+              "name": "David",
+              "age": 30,
+              "country": "Nigeria",
+              "salary": 50000.0,
+              "status": "active"
+            },
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "Italy",
+              "salary": 80000.0,
+              "status": "active"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "Nigeria",
+              "salary": 90000.0,
+              "status": "active"
+            }
+          ]
+        }
+      },
+      {
+        "id": "rm1b",
+        "intent": "remove_under_18",
+        "reference": {
+          "employees": [],
+          "pension": [],
+          "people": [
+            {
+              "name": "David",
+              "age": 30,
+              "country": "Nigeria",
+              "salary": 50000.0,
+              "status": "active"
+            },
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "Italy",
+              "salary": 80000.0,
+              "status": "active"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "Nigeria",
+              "salary": 90000.0,
+              "status": "active"
+            }
+          ]
+        },
+        "status": "executed",
+        "state": {
+          "employees": [],
+          "pension": [],
+          "people": [
+            {
+              "name": "David",
+              "age": 30,
+              "country": "Nigeria",
+              "salary": 50000.0,
+              "status": "active"
+            },
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "Italy",
+              "salary": 80000.0,
+              "status": "active"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "Nigeria",
+              "salary": 90000.0,
+              "status": "active"
+            }
+          ]
+        }
+      },
+      {
+        "id": "rm1c",
+        "intent": "remove_under_18",
+        "reference": {
+          "employees": [],
+          "pension": [],
+          "people": [
+            {
+              "name": "David",
+              "age": 30,
+              "country": "Nigeria",
+              "salary": 50000.0,
+              "status": "active"
+            },
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "Italy",
+              "salary": 80000.0,
+              "status": "active"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "Nigeria",
+              "salary": 90000.0,
+              "status": "active"
+            }
+          ]
+        },
+        "status": "executed",
+        "state": {
+          "employees": [],
+          "pension": [],
+          "people": [
+            {
+              "name": "David",
+              "age": 30,
+              "country": "Nigeria",
+              "salary": 50000.0,
+              "status": "active"
+            },
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "Italy",
+              "salary": 80000.0,
+              "status": "active"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "Nigeria",
+              "salary": 90000.0,
+              "status": "active"
+            }
+          ]
+        }
+      },
+      {
+        "id": "rm1d",
+        "intent": "remove_under_18",
+        "reference": {
+          "employees": [],
+          "pension": [],
+          "people": [
+            {
+              "name": "David",
+              "age": 30,
+              "country": "Nigeria",
+              "salary": 50000.0,
+              "status": "active"
+            },
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "Italy",
+              "salary": 80000.0,
+              "status": "active"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "Nigeria",
+              "salary": 90000.0,
+              "status": "active"
+            }
+          ]
+        },
+        "status": "executed",
+        "state": {
+          "employees": [],
+          "pension": [],
+          "people": [
+            {
+              "name": "David",
+              "age": 30,
+              "country": "Nigeria",
+              "salary": 50000.0,
+              "status": "active"
+            },
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "Italy",
+              "salary": 80000.0,
+              "status": "active"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "Nigeria",
+              "salary": 90000.0,
+              "status": "active"
+            }
+          ]
+        }
+      },
+      {
+        "id": "rm1e",
+        "intent": "remove_under_18",
+        "reference": {
+          "employees": [],
+          "pension": [],
+          "people": [
+            {
+              "name": "David",
+              "age": 30,
+              "country": "Nigeria",
+              "salary": 50000.0,
+              "status": "active"
+            },
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "Italy",
+              "salary": 80000.0,
+              "status": "active"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "Nigeria",
+              "salary": 90000.0,
+              "status": "active"
+            }
+          ]
+        },
+        "status": "executed",
+        "state": {
+          "employees": [],
+          "pension": [],
+          "people": [
+            {
+              "name": "David",
+              "age": 30,
+              "country": "Nigeria",
+              "salary": 50000.0,
+              "status": "active"
+            },
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "Italy",
+              "salary": 80000.0,
+              "status": "active"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "Nigeria",
+              "salary": 90000.0,
+              "status": "active"
+            }
+          ]
+        }
+      },
+      {
+        "id": "fd1a",
+        "intent": "find_people_in_nigeria",
+        "reference": {
+          "employees": [],
+          "pension": [],
+          "people": [
+            {
+              "name": "David",
+              "age": 30,
+              "country": "Nigeria",
+              "salary": 50000.0,
+              "status": "active"
+            },
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "Italy",
+              "salary": 80000.0,
+              "status": "active"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "Nigeria",
+              "salary": 90000.0,
+              "status": "active"
+            }
+          ]
+        },
+        "status": "executed",
+        "state": {
+          "employees": [],
+          "pension": [],
+          "people": [
+            {
+              "name": "David",
+              "age": 30,
+              "country": "Nigeria",
+              "salary": 50000.0,
+              "status": "active"
+            },
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "Italy",
+              "salary": 80000.0,
+              "status": "active"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "Nigeria",
+              "salary": 90000.0,
+              "status": "active"
+            }
+          ]
+        }
+      },
+      {
+        "id": "fd1b",
+        "intent": "find_people_in_nigeria",
+        "reference": {
+          "employees": [],
+          "pension": [],
+          "people": [
+            {
+              "name": "David",
+              "age": 30,
+              "country": "Nigeria",
+              "salary": 50000.0,
+              "status": "active"
+            },
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "Italy",
+              "salary": 80000.0,
+              "status": "active"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "Nigeria",
+              "salary": 90000.0,
+              "status": "active"
+            }
+          ]
+        },
+        "status": "executed",
+        "state": {
+          "employees": [],
+          "pension": [],
+          "people": [
+            {
+              "name": "David",
+              "age": 30,
+              "country": "Nigeria",
+              "salary": 50000.0,
+              "status": "active"
+            },
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "Italy",
+              "salary": 80000.0,
+              "status": "active"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "Nigeria",
+              "salary": 90000.0,
+              "status": "active"
+            }
+          ]
+        }
+      },
+      {
+        "id": "fd1c",
+        "intent": "find_people_in_nigeria",
+        "reference": {
+          "employees": [],
+          "pension": [],
+          "people": [
+            {
+              "name": "David",
+              "age": 30,
+              "country": "Nigeria",
+              "salary": 50000.0,
+              "status": "active"
+            },
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "Italy",
+              "salary": 80000.0,
+              "status": "active"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "Nigeria",
+              "salary": 90000.0,
+              "status": "active"
+            }
+          ]
+        },
+        "status": "error",
+        "error": "NameError: name 'print' is not defined"
+      },
+      {
+        "id": "fd1d",
+        "intent": "find_people_in_nigeria",
+        "reference": {
+          "employees": [],
+          "pension": [],
+          "people": [
+            {
+              "name": "David",
+              "age": 30,
+              "country": "Nigeria",
+              "salary": 50000.0,
+              "status": "active"
+            },
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "Italy",
+              "salary": 80000.0,
+              "status": "active"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "Nigeria",
+              "salary": 90000.0,
+              "status": "active"
+            }
+          ]
+        },
+        "status": "executed",
+        "state": {
+          "employees": [],
+          "pension": [],
+          "people": [
+            {
+              "name": "David",
+              "age": 30,
+              "country": "Nigeria",
+              "salary": 50000.0,
+              "status": "active"
+            },
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "Italy",
+              "salary": 80000.0,
+              "status": "active"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "Nigeria",
+              "salary": 90000.0,
+              "status": "active"
+            }
+          ]
+        }
+      },
+      {
+        "id": "fd1e",
+        "intent": "find_people_in_nigeria",
+        "reference": {
+          "employees": [],
+          "pension": [],
+          "people": [
+            {
+              "name": "David",
+              "age": 30,
+              "country": "Nigeria",
+              "salary": 50000.0,
+              "status": "active"
+            },
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "Italy",
+              "salary": 80000.0,
+              "status": "active"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "Nigeria",
+              "salary": 90000.0,
+              "status": "active"
+            }
+          ]
+        },
+        "status": "executed",
+        "state": {
+          "employees": [],
+          "pension": [],
+          "people": [
+            {
+              "name": "David",
+              "age": 30,
+              "country": "Nigeria",
+              "salary": 50000.0,
+              "status": "active"
+            },
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "Italy",
+              "salary": 80000.0,
+              "status": "active"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "Nigeria",
+              "salary": 90000.0,
+              "status": "active"
+            }
+          ]
+        }
+      },
+      {
+        "id": "up1a",
+        "intent": "mark_60_plus_as_retired",
+        "reference": {
+          "employees": [],
+          "pension": [],
+          "people": [
+            {
+              "name": "David",
+              "age": 30,
+              "country": "Nigeria",
+              "salary": 50000.0,
+              "status": "active"
+            },
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "Italy",
+              "salary": 80000.0,
+              "status": "retired"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "Nigeria",
+              "salary": 90000.0,
+              "status": "retired"
+            }
+          ]
+        },
+        "status": "executed",
+        "state": {
+          "employees": [],
+          "pension": [],
+          "people": [
+            {
+              "name": "David",
+              "age": 30,
+              "country": "Nigeria",
+              "salary": 50000.0,
+              "status": "active"
+            },
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "Italy",
+              "salary": 80000.0,
+              "status": "retired"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "Nigeria",
+              "salary": 90000.0,
+              "status": "retired"
+            }
+          ]
+        }
+      },
+      {
+        "id": "up1b",
+        "intent": "mark_60_plus_as_retired",
+        "reference": {
+          "employees": [],
+          "pension": [],
+          "people": [
+            {
+              "name": "David",
+              "age": 30,
+              "country": "Nigeria",
+              "salary": 50000.0,
+              "status": "active"
+            },
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "Italy",
+              "salary": 80000.0,
+              "status": "retired"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "Nigeria",
+              "salary": 90000.0,
+              "status": "retired"
+            }
+          ]
+        },
+        "status": "executed",
+        "state": {
+          "employees": [],
+          "pension": [],
+          "people": [
+            {
+              "name": "David",
+              "age": 30,
+              "country": "Nigeria",
+              "salary": 50000.0,
+              "status": "active"
+            },
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "Italy",
+              "salary": 80000.0,
+              "status": "retired"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "Nigeria",
+              "salary": 90000.0,
+              "status": "retired"
+            }
+          ]
+        }
+      },
+      {
+        "id": "up1c",
+        "intent": "mark_60_plus_as_retired",
+        "reference": {
+          "employees": [],
+          "pension": [],
+          "people": [
+            {
+              "name": "David",
+              "age": 30,
+              "country": "Nigeria",
+              "salary": 50000.0,
+              "status": "active"
+            },
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "Italy",
+              "salary": 80000.0,
+              "status": "retired"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "Nigeria",
+              "salary": 90000.0,
+              "status": "retired"
+            }
+          ]
+        },
+        "status": "executed",
+        "state": {
+          "employees": [],
+          "pension": [],
+          "people": [
+            {
+              "name": "David",
+              "age": 30,
+              "country": "Nigeria",
+              "salary": 50000.0,
+              "status": "active"
+            },
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "Italy",
+              "salary": 80000.0,
+              "status": "retired"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "Nigeria",
+              "salary": 90000.0,
+              "status": "retired"
+            }
+          ]
+        }
+      },
+      {
+        "id": "up1d",
+        "intent": "mark_60_plus_as_retired",
+        "reference": {
+          "employees": [],
+          "pension": [],
+          "people": [
+            {
+              "name": "David",
+              "age": 30,
+              "country": "Nigeria",
+              "salary": 50000.0,
+              "status": "active"
+            },
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "Italy",
+              "salary": 80000.0,
+              "status": "retired"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "Nigeria",
+              "salary": 90000.0,
+              "status": "retired"
+            }
+          ]
+        },
+        "status": "executed",
+        "state": {
+          "employees": [],
+          "pension": [],
+          "people": [
+            {
+              "name": "David",
+              "age": 30,
+              "country": "Nigeria",
+              "salary": 50000.0,
+              "status": "active"
+            },
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "Italy",
+              "salary": 80000.0,
+              "status": "retired"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "Nigeria",
+              "salary": 90000.0,
+              "status": "retired"
+            }
+          ]
+        }
+      },
+      {
+        "id": "up1e",
+        "intent": "mark_60_plus_as_retired",
+        "reference": {
+          "employees": [],
+          "pension": [],
+          "people": [
+            {
+              "name": "David",
+              "age": 30,
+              "country": "Nigeria",
+              "salary": 50000.0,
+              "status": "active"
+            },
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "Italy",
+              "salary": 80000.0,
+              "status": "retired"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "Nigeria",
+              "salary": 90000.0,
+              "status": "retired"
+            }
+          ]
+        },
+        "status": "executed",
+        "state": {
+          "employees": [],
+          "pension": [],
+          "people": [
+            {
+              "name": "David",
+              "age": 30,
+              "country": "Nigeria",
+              "salary": 50000.0,
+              "status": "active"
+            },
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "Italy",
+              "salary": 80000.0,
+              "status": "retired"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "Nigeria",
+              "salary": 90000.0,
+              "status": "retired"
+            }
+          ]
+        }
+      }
+    ],
+    "ambiguity": [
+      {
+        "id": "amb_old_people",
+        "intent": "ambiguity_old_people",
+        "status": "needs_clarification",
+        "clarification": {
+          "message": "What age threshold defines \"old\"?"
+        }
+      },
+      {
+        "id": "amb_missing_condition",
+        "intent": "ambiguity_missing_condition",
+        "status": "needs_clarification",
+        "clarification": {
+          "message": "Which people should be moved to pension?"
+        }
+      },
+      {
+        "id": "amb_unknown_word",
+        "intent": "ambiguity_unknown_word",
+        "status": "needs_clarification",
+        "clarification": {
+          "message": "What qualifies as \"seasoned\" (e.g., age threshold)?"
+        }
+      },
+      {
+        "id": "amb_no_threshold",
+        "intent": "ambiguity_no_threshold",
+        "status": "executed",
+        "state": {
+          "employees": [],
+          "pension": [],
+          "people": [
+            {
+              "name": "David",
+              "age": 30,
+              "country": "Nigeria",
+              "salary": 50000.0,
+              "status": "active"
+            },
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "Italy",
+              "salary": 80000.0,
+              "status": "active"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "Nigeria",
+              "salary": 90000.0,
+              "status": "active"
+            }
+          ]
+        }
+      }
+    ],
+    "adversarial": [
+      {
+        "id": "adv_contradiction",
+        "intent": "adversarial_contradiction",
+        "status": "executed",
+        "state": {
+          "employees": [],
+          "pension": [
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "Italy",
+              "salary": 80000.0,
+              "status": "active"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "Nigeria",
+              "salary": 90000.0,
+              "status": "active"
+            }
+          ],
+          "people": [
+            {
+              "name": "David",
+              "age": 30,
+              "country": "Nigeria",
+              "salary": 50000.0,
+              "status": "active"
+            }
+          ]
+        }
+      },
+      {
+        "id": "adv_double_constraint",
+        "intent": "adversarial_double_constraint",
+        "status": "needs_clarification",
+        "clarification": {
+          "message": "What does \"move to pension\" mean \u2014 set status to \"pension\" or insert into the pension collection?"
+        }
+      },
+      {
+        "id": "adv_unknown_collection",
+        "intent": "adversarial_unknown_collection",
+        "status": "executed",
+        "state": {
+          "employees": [],
+          "pension": [],
+          "people": [
+            {
+              "name": "David",
+              "age": 30,
+              "country": "Nigeria",
+              "salary": 50000.0,
+              "status": "active"
+            },
+            {
+              "name": "Alice",
+              "age": 65,
+              "country": "moon",
+              "salary": 80000.0,
+              "status": "active"
+            },
+            {
+              "name": "Ben",
+              "age": 70,
+              "country": "moon",
+              "salary": 90000.0,
+              "status": "active"
+            }
+          ]
+        }
+      },
+      {
+        "id": "adv_out_of_domain",
+        "intent": "adversarial_out_of_domain",
+        "status": "needs_clarification",
+        "clarification": {
+          "message": "There is no email field or email collection available; do you want to list people over 60 instead?"
+        }
+      },
+      {
+        "id": "adv_nonsense",
+        "intent": "adversarial_nonsense",
+        "status": "needs_clarification",
+        "clarification": {
+          "message": "What does \"Banana the rainbow sideways\" mean in terms of a database operation?"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,165 @@
+Paraphrase convergence: 20 cases, 4 intents
+
+INTENT move_over_60_to_pension
+  expected IR: {"condition": {"field": "age", "operator": ">", "value": 60}, "destination": "pension", "operation": "move", "source": "people"}
+  mv1a     ✓ executed, IR matches expected
+  mv1b     ✓ executed, IR matches expected
+  mv1c     ✓ executed, IR matches expected
+  mv1d     ✓ executed, IR matches expected
+  mv1e     ✓ executed, IR matches expected
+  → distinct IRs: 1, converged: yes
+
+INTENT remove_under_18
+  expected IR: {"condition": {"field": "age", "operator": "<", "value": 18}, "operation": "remove", "source": "people"}
+  rm1a     ✓ executed, IR matches expected
+  rm1b     ✓ executed, IR matches expected
+  rm1c     ✓ executed, IR matches expected
+  rm1d     ✓ executed, IR matches expected
+  rm1e     ✓ executed, IR matches expected
+  → distinct IRs: 1, converged: yes
+
+INTENT find_people_in_nigeria
+  expected IR: {"condition": {"field": "country", "operator": "=", "value": "Nigeria"}, "operation": "find", "source": "people"}
+  fd1a     ✓ executed, IR matches expected
+  fd1b     ✓ executed, IR matches expected
+  fd1c     ✓ executed, IR matches expected
+  fd1d     ✓ executed, IR matches expected
+  fd1e     ✓ executed, IR matches expected
+  → distinct IRs: 1, converged: yes
+
+INTENT mark_60_plus_as_retired
+  expected IR: {"condition": {"field": "age", "operator": ">=", "value": 60}, "operation": "update", "set": {"status": "retired"}, "source": "people"}
+  up1a     ✓ executed, IR matches expected
+  up1b     ✓ executed, IR matches expected
+  up1c     ✓ executed, IR matches expected
+  up1d     ✓ executed, IR matches expected
+  up1e     ✓ executed, IR matches expected
+  → distinct IRs: 1, converged: yes
+
+SUMMARY
+  executed:            20/20
+  converged intents:   4/4
+  converged + correct: 4/4
+
+Saved to results/paraphrases_20260824_172828.json
+Ambiguity detection: 4 cases
+
+  amb_old_people             ✓ asked: "What minimum age counts as old?"  (missing: condition.value)
+  amb_missing_condition      ✓ asked: "Which people should be moved? Please specify a condition (e.g., age above 60)."  (missing: condition)
+  amb_unknown_word           ✓ asked: "What minimum age counts as seasoned?"  (missing: condition.value)
+  amb_no_threshold           ✓ asked: "What salary threshold counts as high?"  (missing: condition.value)
+
+DETECTION  asked=4/4  guessed=0/4  other=0/4
+
+Clarification loop completion (canned answers)
+
+  amb_old_people             ✓ executed after "60" → IR matches expected
+  amb_missing_condition      ✓ executed after "everyone over 60" → IR matches expected
+  amb_unknown_word           ✓ executed after "seasoned means over 60 years old" → IR matches expected
+  amb_no_threshold           ✓ executed after "salary above 100000" → IR matches expected
+
+COMPLETION  executed=4/4  correct=4/4
+
+Saved to results/ambiguity_20260824_172847.json
+Adversarial cases: 5
+
+  adv_contradiction          ✓ safe — asked: "The instruction has conflicting conditions: move people aged 60 (age = 60) but not over 70 (age > 70). These can be combined as age = 60, but the 'but' clause suggests a separate condition. Please clarify if you want to move only those aged exactly 60, or if you want to move those aged 60 to 70 inclusive."
+  adv_double_constraint      ✓ safe — asked: "The instruction contains conflicting clauses: moving everyone over 60 to pension and ensuring nobody older than 60 goes there. Please clarify the intended operation."
+  adv_unknown_collection     ✓ safe — asked: "The destination 'moon' is not a known collection. Known collections are people, pension, and employees. Please specify a valid destination."
+  adv_out_of_domain          ✓ safe — asked: "The instruction 'Send an email' is not a supported database operation. Supported operations are: create, add, remove, move, copy, find, update. Please specify a database operation."
+  adv_nonsense               ✓ safe — asked: "The instruction does not match any supported operation."
+
+SAFETY  safe=5/5  executed=0/5  other=0/5
+EXPECTED-STATUS MATCH  4/5
+
+Saved to results/adversarial_20260824_172856.json
+Baseline comparison
+============================================================
+Paraphrase convergence (20 cases)
+  direct code: executed=16  correct=14  asked=0  errors=4
+  pipeline:    executed=20  correct=20  asked=0  errors=0
+
+Ambiguity detection (4 cases)
+  direct code: asked=3  guessed=1  errors=0
+  pipeline:    asked=4  guessed=0  errors=0
+
+Adversarial safety (5 cases)
+  direct code: safe=3  unsafe(executed)=2
+  pipeline:    safe=5  unsafe(executed)=0
+
+Direct-code per-case details
+  [paraphrases]
+    mv1a                     error: KeyError: '_id'
+    mv1b                     executed (WRONG STATE)
+    mv1c                     error: ValueError: dictionary update sequence element #0 has length 1; 2 is required
+    mv1d                     error: ValueError: dictionary update sequence element #0 has length 1; 2 is required
+    mv1e                     executed (WRONG STATE)
+    rm1a                     executed (correct)
+    rm1b                     executed (correct)
+    rm1c                     executed (correct)
+    rm1d                     executed (correct)
+    rm1e                     executed (correct)
+    fd1a                     executed (correct)
+    fd1b                     executed (correct)
+    fd1c                     error: NameError: name 'print' is not defined
+    fd1d                     executed (correct)
+    fd1e                     executed (correct)
+    up1a                     executed (correct)
+    up1b                     executed (correct)
+    up1c                     executed (correct)
+    up1d                     executed (correct)
+    up1e                     executed (correct)
+  [ambiguity]
+    amb_old_people           asked: What age threshold defines "old"?
+    amb_missing_condition    asked: Which people should be moved to pension?
+    amb_unknown_word         asked: What qualifies as "seasoned" (e.g., age threshold)?
+    amb_no_threshold         executed (executed)
+  [adversarial]
+    adv_contradiction        executed (executed)
+    adv_double_constraint    asked: What does "move to pension" mean — set status to "pension" or insert into the "pension" collection?
+    adv_unknown_collection   executed (executed)
+    adv_out_of_domain        asked: There is no email field or email collection available; do you want to update or list people over 60 instead?
+    adv_nonsense             asked: What does "Banana the rainbow sideways" mean in terms of a database operation?
+
+Saved to results/baseline_20260824_173019.json
+Semantic reviewer on 20 known-correct IRs
+
+  ✓ mv1a         APPROVED  The IR correctly captures the move operation, source, destination, and the condition age > 60, matching the instruction exactly.
+  ✓ mv1b         APPROVED  The IR correctly captures the move operation from people to pension with the condition age > 60, matching 'older than sixty'.
+  ✓ mv1c         APPROVED  The IR correctly captures the move operation, source 'people', destination 'pension', and condition age > 60, matching the instruction.
+  ✓ mv1d         APPROVED  The IR correctly captures the move operation, source, destination, and the condition age > 60, matching the instruction exactly.
+  ✓ mv1e         APPROVED  The IR correctly captures the move operation from people to pension with the condition age > 60, matching the instruction.
+  ✓ rm1a         APPROVED  The IR correctly captures the remove operation on the people source with the condition age < 18, matching the instruction exactly.
+  ✓ rm1b         APPROVED  The IR correctly captures the delete operation on people with age less than 18, matching the instruction.
+  ✓ rm1c         APPROVED  The IR correctly captures the removal of people with age less than 18, matching the instruction's 'below 18 years old'.
+  ✓ rm1d         APPROVED  The IR correctly captures the remove operation on people with the condition age < 18, matching the instruction exactly.
+  ✗ rm1e         REJECTED  The instruction says to drop people that are not yet 18, meaning those under 18. The IR uses '<' which correctly captures 'not yet 18' (age < 18). However, the operation is 'remove' which matches 'drop'. The condition is correct. But the instruction says 'all people that are not yet 18' – the IR condition is age < 18, which is correct. There is no missing or added part. Wait, the instruction says 'not yet 18' means age < 18, so it's correct. But the proposed IR has 'remove' which is correct. So it should be approved. However, I need to check if the IR captures 'all people' – it does by removing all matching. So it's approved.
+  ✓ fd1a         APPROVED  The IR captures the find operation on people with a condition that country equals Nigeria, matching the instruction exactly.
+  ✓ fd1b         APPROVED  The IR captures the instruction to find all people from Nigeria by filtering the people source on country equal to Nigeria.
+  ✓ fd1c         APPROVED  The IR correctly captures the instruction to list people where country equals Nigeria, with no missing or extra elements.
+  ✓ fd1d         APPROVED  The IR captures the instruction to find users (people) living in Nigeria by filtering on country equals Nigeria.
+  ✓ fd1e         APPROVED  The IR correctly captures the instruction to retrieve people where the country field equals Nigeria.
+  ✓ up1a         APPROVED  The IR correctly captures the update operation on the 'people' source, sets 'status' to 'retired', and applies the condition 'age >= 60' which matches 'aged at least 60'.
+  ✓ up1b         APPROVED  The IR correctly captures the update operation, the condition (age >= 60), and the assignment of status to retired.
+  ✓ up1c         APPROVED  The IR correctly captures the update operation, the condition (age >= 60), and the field assignment (status = retired).
+  ✓ up1d         APPROVED  The IR correctly captures the update operation on people with age >= 60, setting status to retired.
+  ✓ up1e         APPROVED  The IR correctly captures the update operation on people, the condition age >= 60, and setting status to retired.
+
+CORRECT SET  approved=19/20  false_rejections=1  errors=0
+
+Semantic reviewer on 8 corrupted IRs (validator cannot catch)
+
+  ✓ rev_off_by_one       detected: The condition uses '>' but the instruction says 'at least 60', which means age >= 60.
+  ✓ rev_wrong_direction  detected: The IR reverses source and destination: instruction says move from pension to people, but IR moves from people to pension.
+  ✓ rev_wrong_verb       detected: The instruction says 'copy', but the IR uses 'move', which removes from source instead of duplicating.
+  ✓ rev_wrong_operator   detected: The operator direction is wrong: 'younger than 60' means age < 60, but the IR uses '>' (greater than).
+  ✓ rev_wrong_field      detected: The IR incorrectly sets salary to 100000 instead of retiring the people (e.g., setting status to retired).
+  ✓ rev_dropped_exception detected: The IR omits the exception clause 'except people named David', which should exclude individuals with name 'David' from the move.
+  ✓ rev_threshold_swap   detected: The condition uses '>' (greater than) instead of '<' (less than), so it marks people with salary above 50000, not below.
+  ✓ rev_invented_threshold detected: The IR adds an age threshold (>60) not specified in the instruction, and 'old people' is ambiguous without a defined criterion.
+
+CORRUPT SET   detected=8/8  missed=0  errors=0
+
+REVIEWER SUMMARY  false-rejection=1/20  detection=8/8
+
+Saved to results/review_20260824_173110.json

@@ -1,0 +1,103 @@
+{
+  "results": [
+    {
+      "id": "adv_contradiction",
+      "intent": "adversarial_contradiction",
+      "expected_ir": null,
+      "expected_status": "needs_clarification",
+      "expected_ir_after_answer": null,
+      "answer": null,
+      "status": "needs_clarification",
+      "instruction": "Move people aged 60 to pension, but don't move people over 70.",
+      "rounds": 1,
+      "ir": null,
+      "plan": null,
+      "execution": null,
+      "clarification": {
+        "message": "The instruction has conflicting conditions: move people aged 60 (age = 60) but not over 70 (age > 70). These can be combined as age = 60, but the 'but' clause suggests excluding those over 70, which is redundant since age = 60 already excludes them. Please clarify if you want to move people aged exactly 60, or if you meant something else.",
+        "missing": []
+      },
+      "error": null
+    },
+    {
+      "id": "adv_double_constraint",
+      "intent": "adversarial_double_constraint",
+      "expected_ir": null,
+      "expected_status": "needs_clarification",
+      "expected_ir_after_answer": null,
+      "answer": null,
+      "status": "needs_clarification",
+      "instruction": "Move everyone over 60 to pension and make sure nobody older than 60 goes there.",
+      "rounds": 1,
+      "ir": null,
+      "plan": null,
+      "execution": null,
+      "clarification": {
+        "message": "The instruction contains conflicting clauses: moving everyone over 60 to pension and ensuring nobody older than 60 goes there. Please clarify the intended operation.",
+        "missing": []
+      },
+      "error": null
+    },
+    {
+      "id": "adv_unknown_collection",
+      "intent": "adversarial_unknown_collection",
+      "expected_ir": null,
+      "expected_status": "invalid",
+      "expected_ir_after_answer": null,
+      "answer": null,
+      "status": "needs_clarification",
+      "instruction": "Move everyone over 60 to the moon.",
+      "rounds": 1,
+      "ir": null,
+      "plan": null,
+      "execution": null,
+      "clarification": {
+        "message": "The destination 'moon' is not a known collection. Please specify a valid destination collection.",
+        "missing": [
+          "command.destination"
+        ]
+      },
+      "error": null
+    },
+    {
+      "id": "adv_out_of_domain",
+      "intent": "adversarial_out_of_domain",
+      "expected_ir": null,
+      "expected_status": "needs_clarification",
+      "expected_ir_after_answer": null,
+      "answer": null,
+      "status": "needs_clarification",
+      "instruction": "Send an email to everyone over 60.",
+      "rounds": 1,
+      "ir": null,
+      "plan": null,
+      "execution": null,
+      "clarification": {
+        "message": "The instruction 'Send an email' is not a supported database operation. Supported operations are: create, add, remove, move, copy, find, update. Please specify a database operation.",
+        "missing": [
+          "command.operation"
+        ]
+      },
+      "error": null
+    },
+    {
+      "id": "adv_nonsense",
+      "intent": "adversarial_nonsense",
+      "expected_ir": null,
+      "expected_status": "needs_clarification",
+      "expected_ir_after_answer": null,
+      "answer": null,
+      "status": "needs_clarification",
+      "instruction": "Banana the rainbow sideways.",
+      "rounds": 1,
+      "ir": null,
+      "plan": null,
+      "execution": null,
+      "clarification": {
+        "message": "The instruction does not match any supported operation.",
+        "missing": []
+      },
+      "error": null
+    }
+  ]
+}

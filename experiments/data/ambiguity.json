@@ -1,0 +1,54 @@
+[
+  {
+    "id": "amb_old_people",
+    "intent": "ambiguity_old_people",
+    "instruction": "Move all the old people to pension.",
+    "expected_status": "needs_clarification",
+    "answer": "60",
+    "expected_ir_after_answer": {
+      "operation": "move",
+      "source": "people",
+      "destination": "pension",
+      "condition": {"field": "age", "operator": ">", "value": 60}
+    }
+  },
+  {
+    "id": "amb_missing_condition",
+    "intent": "ambiguity_missing_condition",
+    "instruction": "Move people to pension.",
+    "expected_status": "needs_clarification",
+    "answer": "everyone over 60",
+    "expected_ir_after_answer": {
+      "operation": "move",
+      "source": "people",
+      "destination": "pension",
+      "condition": {"field": "age", "operator": ">", "value": 60}
+    }
+  },
+  {
+    "id": "amb_unknown_word",
+    "intent": "ambiguity_unknown_word",
+    "instruction": "Move all the seasoned people to pension.",
+    "expected_status": "needs_clarification",
+    "answer": "seasoned means over 60 years old",
+    "expected_ir_after_answer": {
+      "operation": "move",
+      "source": "people",
+      "destination": "pension",
+      "condition": {"field": "age", "operator": ">", "value": 60}
+    }
+  },
+  {
+    "id": "amb_no_threshold",
+    "intent": "ambiguity_no_threshold",
+    "instruction": "Retire everyone with a high salary.",
+    "expected_status": "needs_clarification",
+    "answer": "salary above 100000",
+    "expected_ir_after_answer": {
+      "operation": "update",
+      "source": "people",
+      "condition": {"field": "salary", "operator": ">", "value": 100000},
+      "set": {"status": "retired"}
+    }
+  }
+]

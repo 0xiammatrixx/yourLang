@@ -1,0 +1,232 @@
+{
+  "results": [
+    {
+      "id": "adv_contradiction",
+      "intent": "adversarial_contradiction",
+      "expected_ir": null,
+      "expected_status": "needs_clarification",
+      "expected_ir_after_answer": null,
+      "answer": null,
+      "status": "executed",
+      "instruction": "Move people aged 60 to pension, but don't move people over 70.",
+      "rounds": 1,
+      "ir": {
+        "operation": "move",
+        "source": "people",
+        "destination": "pension",
+        "condition": {
+          "field": "age",
+          "operator": "=",
+          "value": 60
+        }
+      },
+      "plan": {
+        "steps": [
+          {
+            "action": "find",
+            "collection": "people",
+            "filter": {
+              "age": {
+                "$eq": 60
+              }
+            },
+            "documents": null,
+            "updates": null,
+            "store": "matched"
+          },
+          {
+            "action": "delete_many",
+            "collection": "people",
+            "filter": {
+              "age": {
+                "$eq": 60
+              }
+            },
+            "documents": null,
+            "updates": null,
+            "store": null
+          },
+          {
+            "action": "insert_many",
+            "collection": "pension",
+            "filter": null,
+            "documents": {
+              "$ref": "matched"
+            },
+            "updates": null,
+            "store": null
+          }
+        ],
+        "return_store": null
+      },
+      "execution": {
+        "result": null,
+        "log": [
+          {
+            "action": "find",
+            "collection": "people",
+            "matched": 0
+          },
+          {
+            "action": "delete_many",
+            "collection": "people",
+            "removed": 0
+          },
+          {
+            "action": "insert_many",
+            "collection": "pension",
+            "inserted": 0
+          }
+        ]
+      },
+      "clarification": null,
+      "error": null
+    },
+    {
+      "id": "adv_double_constraint",
+      "intent": "adversarial_double_constraint",
+      "expected_ir": null,
+      "expected_status": "needs_clarification",
+      "expected_ir_after_answer": null,
+      "answer": null,
+      "status": "executed",
+      "instruction": "Move everyone over 60 to pension and make sure nobody older than 60 goes there.",
+      "rounds": 1,
+      "ir": {
+        "operation": "move",
+        "source": "people",
+        "destination": "pension",
+        "condition": {
+          "field": "age",
+          "operator": ">",
+          "value": 60
+        }
+      },
+      "plan": {
+        "steps": [
+          {
+            "action": "find",
+            "collection": "people",
+            "filter": {
+              "age": {
+                "$gt": 60
+              }
+            },
+            "documents": null,
+            "updates": null,
+            "store": "matched"
+          },
+          {
+            "action": "delete_many",
+            "collection": "people",
+            "filter": {
+              "age": {
+                "$gt": 60
+              }
+            },
+            "documents": null,
+            "updates": null,
+            "store": null
+          },
+          {
+            "action": "insert_many",
+            "collection": "pension",
+            "filter": null,
+            "documents": {
+              "$ref": "matched"
+            },
+            "updates": null,
+            "store": null
+          }
+        ],
+        "return_store": null
+      },
+      "execution": {
+        "result": null,
+        "log": [
+          {
+            "action": "find",
+            "collection": "people",
+            "matched": 2
+          },
+          {
+            "action": "delete_many",
+            "collection": "people",
+            "removed": 2
+          },
+          {
+            "action": "insert_many",
+            "collection": "pension",
+            "inserted": 2
+          }
+        ]
+      },
+      "clarification": null,
+      "error": null
+    },
+    {
+      "id": "adv_unknown_collection",
+      "intent": "adversarial_unknown_collection",
+      "expected_ir": null,
+      "expected_status": "invalid",
+      "expected_ir_after_answer": null,
+      "answer": null,
+      "status": "needs_clarification",
+      "instruction": "Move everyone over 60 to the moon.",
+      "rounds": 1,
+      "ir": null,
+      "plan": null,
+      "execution": null,
+      "clarification": {
+        "message": "The destination 'moon' is not a known collection. Please specify a valid destination collection.",
+        "missing": [
+          "command.destination"
+        ]
+      },
+      "error": null
+    },
+    {
+      "id": "adv_out_of_domain",
+      "intent": "adversarial_out_of_domain",
+      "expected_ir": null,
+      "expected_status": "needs_clarification",
+      "expected_ir_after_answer": null,
+      "answer": null,
+      "status": "needs_clarification",
+      "instruction": "Send an email to everyone over 60.",
+      "rounds": 1,
+      "ir": null,
+      "plan": null,
+      "execution": null,
+      "clarification": {
+        "message": "Which collection should be used as the source for 'everyone'? Also, what action should be taken on the matching records (e.g., move, copy, update)?",
+        "missing": [
+          "command.source",
+          "command.operation"
+        ]
+      },
+      "error": null
+    },
+    {
+      "id": "adv_nonsense",
+      "intent": "adversarial_nonsense",
+      "expected_ir": null,
+      "expected_status": "needs_clarification",
+      "expected_ir_after_answer": null,
+      "answer": null,
+      "status": "needs_clarification",
+      "instruction": "Banana the rainbow sideways.",
+      "rounds": 1,
+      "ir": null,
+      "plan": null,
+      "execution": null,
+      "clarification": {
+        "message": "The instruction is not a supported database operation. Please provide a clear instruction such as add, remove, move, copy, find, update, or create.",
+        "missing": [
+          "command"
+        ]
+      },
+      "error": null
+    }
+  ]
+}

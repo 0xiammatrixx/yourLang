@@ -1,0 +1,212 @@
+[
+  {
+    "id": "mv1a",
+    "intent": "move_over_60_to_pension",
+    "instruction": "Move everyone aged above 60 to collection pension.",
+    "expected_ir": {
+      "operation": "move",
+      "source": "people",
+      "destination": "pension",
+      "condition": {"field": "age", "operator": ">", "value": 60}
+    }
+  },
+  {
+    "id": "mv1b",
+    "intent": "move_over_60_to_pension",
+    "instruction": "Put all people older than sixty in the pension collection.",
+    "expected_ir": {
+      "operation": "move",
+      "source": "people",
+      "destination": "pension",
+      "condition": {"field": "age", "operator": ">", "value": 60}
+    }
+  },
+  {
+    "id": "mv1c",
+    "intent": "move_over_60_to_pension",
+    "instruction": "Transfer users whose age exceeds 60 into pension.",
+    "expected_ir": {
+      "operation": "move",
+      "source": "people",
+      "destination": "pension",
+      "condition": {"field": "age", "operator": ">", "value": 60}
+    }
+  },
+  {
+    "id": "mv1d",
+    "intent": "move_over_60_to_pension",
+    "instruction": "Take everybody over the age of 60 and move them to pension.",
+    "expected_ir": {
+      "operation": "move",
+      "source": "people",
+      "destination": "pension",
+      "condition": {"field": "age", "operator": ">", "value": 60}
+    }
+  },
+  {
+    "id": "mv1e",
+    "intent": "move_over_60_to_pension",
+    "instruction": "Pension should contain all users with age greater than 60.",
+    "expected_ir": {
+      "operation": "move",
+      "source": "people",
+      "destination": "pension",
+      "condition": {"field": "age", "operator": ">", "value": 60}
+    }
+  },
+  {
+    "id": "rm1a",
+    "intent": "remove_under_18",
+    "instruction": "Remove everyone younger than 18 from people.",
+    "expected_ir": {
+      "operation": "remove",
+      "source": "people",
+      "condition": {"field": "age", "operator": "<", "value": 18}
+    }
+  },
+  {
+    "id": "rm1b",
+    "intent": "remove_under_18",
+    "instruction": "Delete all people under the age of 18.",
+    "expected_ir": {
+      "operation": "remove",
+      "source": "people",
+      "condition": {"field": "age", "operator": "<", "value": 18}
+    }
+  },
+  {
+    "id": "rm1c",
+    "intent": "remove_under_18",
+    "instruction": "Take out anybody below 18 years old.",
+    "expected_ir": {
+      "operation": "remove",
+      "source": "people",
+      "condition": {"field": "age", "operator": "<", "value": 18}
+    }
+  },
+  {
+    "id": "rm1d",
+    "intent": "remove_under_18",
+    "instruction": "Remove every person whose age is less than 18.",
+    "expected_ir": {
+      "operation": "remove",
+      "source": "people",
+      "condition": {"field": "age", "operator": "<", "value": 18}
+    }
+  },
+  {
+    "id": "rm1e",
+    "intent": "remove_under_18",
+    "instruction": "Drop all people that are not yet 18.",
+    "expected_ir": {
+      "operation": "remove",
+      "source": "people",
+      "condition": {"field": "age", "operator": "<", "value": 18}
+    }
+  },
+  {
+    "id": "fd1a",
+    "intent": "find_people_in_nigeria",
+    "instruction": "Find everyone whose country is Nigeria.",
+    "expected_ir": {
+      "operation": "find",
+      "source": "people",
+      "condition": {"field": "country", "operator": "=", "value": "Nigeria"}
+    }
+  },
+  {
+    "id": "fd1b",
+    "intent": "find_people_in_nigeria",
+    "instruction": "Show me all people from Nigeria.",
+    "expected_ir": {
+      "operation": "find",
+      "source": "people",
+      "condition": {"field": "country", "operator": "=", "value": "Nigeria"}
+    }
+  },
+  {
+    "id": "fd1c",
+    "intent": "find_people_in_nigeria",
+    "instruction": "List the people with country equal to Nigeria.",
+    "expected_ir": {
+      "operation": "find",
+      "source": "people",
+      "condition": {"field": "country", "operator": "=", "value": "Nigeria"}
+    }
+  },
+  {
+    "id": "fd1d",
+    "intent": "find_people_in_nigeria",
+    "instruction": "Get all users that live in Nigeria.",
+    "expected_ir": {
+      "operation": "find",
+      "source": "people",
+      "condition": {"field": "country", "operator": "=", "value": "Nigeria"}
+    }
+  },
+  {
+    "id": "fd1e",
+    "intent": "find_people_in_nigeria",
+    "instruction": "Retrieve people whose country is Nigeria.",
+    "expected_ir": {
+      "operation": "find",
+      "source": "people",
+      "condition": {"field": "country", "operator": "=", "value": "Nigeria"}
+    }
+  },
+  {
+    "id": "up1a",
+    "intent": "mark_60_plus_as_retired",
+    "instruction": "Set status to retired for everyone aged at least 60 in people.",
+    "expected_ir": {
+      "operation": "update",
+      "source": "people",
+      "condition": {"field": "age", "operator": ">=", "value": 60},
+      "set": {"status": "retired"}
+    }
+  },
+  {
+    "id": "up1b",
+    "intent": "mark_60_plus_as_retired",
+    "instruction": "Mark everyone who is 60 or older as retired.",
+    "expected_ir": {
+      "operation": "update",
+      "source": "people",
+      "condition": {"field": "age", "operator": ">=", "value": 60},
+      "set": {"status": "retired"}
+    }
+  },
+  {
+    "id": "up1c",
+    "intent": "mark_60_plus_as_retired",
+    "instruction": "Change the status field to retired for people aged 60 or more.",
+    "expected_ir": {
+      "operation": "update",
+      "source": "people",
+      "condition": {"field": "age", "operator": ">=", "value": 60},
+      "set": {"status": "retired"}
+    }
+  },
+  {
+    "id": "up1d",
+    "intent": "mark_60_plus_as_retired",
+    "instruction": "Everyone in people whose age is 60 or above should have their status set to retired.",
+    "expected_ir": {
+      "operation": "update",
+      "source": "people",
+      "condition": {"field": "age", "operator": ">=", "value": 60},
+      "set": {"status": "retired"}
+    }
+  },
+  {
+    "id": "up1e",
+    "intent": "mark_60_plus_as_retired",
+    "instruction": "Update people to retired status when age is at least 60.",
+    "expected_ir": {
+      "operation": "update",
+      "source": "people",
+      "condition": {"field": "age", "operator": ">=", "value": 60},
+      "set": {"status": "retired"}
+    }
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "id": "adv_contradiction",
+    "intent": "adversarial_contradiction",
+    "instruction": "Move people aged 60 to pension, but don't move people over 70.",
+    "expected_status": "needs_clarification"
+  },
+  {
+    "id": "adv_double_constraint",
+    "intent": "adversarial_double_constraint",
+    "instruction": "Move everyone over 60 to pension and make sure nobody older than 60 goes there.",
+    "expected_status": "needs_clarification"
+  },
+  {
+    "id": "adv_unknown_collection",
+    "intent": "adversarial_unknown_collection",
+    "instruction": "Move everyone over 60 to the moon.",
+    "expected_status": "invalid"
+  },
+  {
+    "id": "adv_out_of_domain",
+    "intent": "adversarial_out_of_domain",
+    "instruction": "Send an email to everyone over 60.",
+    "expected_status": "needs_clarification"
+  },
+  {
+    "id": "adv_nonsense",
+    "intent": "adversarial_nonsense",
+    "instruction": "Banana the rainbow sideways.",
+    "expected_status": "needs_clarification"
+  }
+]

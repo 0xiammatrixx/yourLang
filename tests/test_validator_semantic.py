@@ -1,0 +1,156 @@
+"""Tests for the semantic validator — no LLM involved."""
+
+import pytest
+
+from ir.models import TranslationResult
+from validator.semantic import SemanticError, validate
+
+
+def command(raw: dict):
+    """Build a structurally validated IR command from raw JSON."""
+    return TranslationResult.model_validate(
+        {"status": "complete", "command": raw}
+    ).command
+
+
+MOVE = {
+    "operation": "move",
+    "source": "people",
+    "destination": "pension",
+    "condition": {"field": "age", "operator": ">", "value": 60},
+}
+
+
+def test_valid_move_passes():
+    assert validate(command(MOVE)) is not None
+
+
+def test_unknown_source_rejected():
+    with pytest.raises(SemanticError):
+        validate(command({**MOVE, "source": "banana"}))
+
+
+def test_unknown_destination_rejected():
+    with pytest.raises(SemanticError):
+        validate(command({**MOVE, "destination": "banana"}))
+
+
+def test_unknown_field_rejected():
+    with pytest.raises(SemanticError):
+        validate(
+            command(
+                {
+                    **MOVE,
+                    "condition": {"field": "hair", "operator": ">", "value": 60},
+                }
+            )
+        )
+
+
+def test_wrong_value_type_rejected():
+    with pytest.raises(SemanticError):
+        validate(
+            command(
+                {
+                    **MOVE,
+                    "condition": {"field": "age", "operator": ">", "value": "sixty"},
+                }
+            )
+        )
+
+
+def test_same_source_and_destination_rejected():
+    with pytest.raises(SemanticError):
+        validate(command({**MOVE, "destination": "people"}))
+
+
+def test_create_new_collection_allowed():
+    validate(command({"operation": "create", "destination": "archive"}))
+
+
+def test_create_existing_collection_rejected():
+    with pytest.raises(SemanticError):
+        validate(command({"operation": "create", "destination": "people"}))
+
+
+def test_create_bad_name_rejected():
+    with pytest.raises(SemanticError):
+        validate(command({"operation": "create", "destination": "2 fast"}))
+
+
+def test_find_string_condition_ok():
+    validate(
+        command(
+            {
+                "operation": "find",
+                "source": "people",
+                "condition": {"field": "name", "operator": "=", "value": "David"},
+            }
+        )
+    )
+
+
+def test_add_known_record_ok():
+    validate(
+        command(
+            {
+                "operation": "add",
+                "destination": "employees",
+                "records": [{"name": "David", "age": 30, "salary": 50000.0}],
+            }
+        )
+    )
+
+
+def test_add_unknown_field_rejected():
+    with pytest.raises(SemanticError):
+        validate(
+            command(
+                {
+                    "operation": "add",
+                    "destination": "employees",
+                    "records": [{"pet": "cat"}],
+                }
+            )
+        )
+
+
+def test_update_set_ok():
+    validate(
+        command(
+            {
+                "operation": "update",
+                "source": "people",
+                "condition": {"field": "age", "operator": ">=", "value": 60},
+                "set": {"status": "retired"},
+            }
+        )
+    )
+
+
+def test_update_set_unknown_field_rejected():
+    with pytest.raises(SemanticError):
+        validate(
+            command(
+                {
+                    "operation": "update",
+                    "source": "people",
+                    "condition": {"field": "age", "operator": ">=", "value": 60},
+                    "set": {"pets": "retired"},
+                }
+            )
+        )
+
+
+def test_update_set_wrong_type_rejected():
+    with pytest.raises(SemanticError):
+        validate(
+            command(
+                {
+                    "operation": "update",
+                    "source": "people",
+                    "condition": {"field": "age", "operator": ">=", "value": 60},
+                    "set": {"salary": "a lot"},
+                }
+            )
+        )
