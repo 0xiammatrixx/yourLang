@@ -65,6 +65,23 @@ results/                                    # saved experiment results
 docs/                                       # research map, question, paper skeleton
 ```
 
+## Web GUI
+
+A small Flask app shows the in-memory database and the full pipeline trace in
+the browser.
+
+```bash
+.venv/bin/python -m gui.app        # then open http://127.0.0.1:5001
+```
+
+- Type an instruction (e.g. `Create a new collection called arsenal_players`)
+  and press **Run** — the collection appears in the **Database** view below.
+- The page shows the last outcome: status, the IR, the MongoDB plan, and the
+  execution log.
+- When clarification is needed, an answer box appears — reply to continue.
+- **Reset database** restores the seed collections (`people`, `employees`,
+  `pension`).
+
 ## Experiments
 
 | # | Experiment | Command |

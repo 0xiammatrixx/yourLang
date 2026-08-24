@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>NL → IR → MongoDB</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <h1>NL → IR → MongoDB</h1>
+
+  <form method="post" action="/execute" class="run">
+    <input name="instruction" placeholder='e.g. "Create a new collection called arsenal_players"' autofocus size="64">
+    <button type="submit">Run</button>
+  </form>
+
+  {% if pending %}
+  <div class="clarify">
+    <strong>Clarification needed:</strong> {{ pending.question }}
+    <form method="post" action="/execute">
+      <input type="hidden" name="instruction" value="{{ pending.instruction }}">
+      <input name="answer" placeholder="Your answer" autofocus size="40">
+      <button type="submit">Answer</button>
+    </form>
+  </div>
+  {% endif %}
+
+  {% if last %}
+  <div class="outcome status-{{ last.status }}">
+    <h2>Last result — <span class="badge">{{ last.status }}</span></h2>
+    {% if last.ir %}<p><b>IR:</b></p><pre>{{ last.ir | tojson(indent=2) }}</pre>{% endif %}
+    {% if last.plan %}<p><b>MongoDB plan:</b></p><pre>{{ last.plan | tojson(indent=2) }}</pre>{% endif %}
+    {% if last.execution %}<p><b>Execution log:</b></p><pre>{{ last.execution.log | tojson(indent=2) }}</pre>{% endif %}
+    {% if last.clarification %}<p><b>Question:</b> {{ last.clarification.message }}</p>{% endif %}
+    {% if last.error %}<p class="error"><b>Error:</b> {{ last.error }}</p>{% endif %}
+  </div>
+  {% endif %}
+
+  <h2>Database</h2>
+  <form method="post" action="/reset"><button type="submit">Reset database</button></form>
+
+  {% for name, docs in collections.items() %}
+  <section class="collection">
+    <h3>{{ name }} <span class="count">{{ docs|length }} doc(s)</span></h3>
+    {% if docs %}
+      <table>
+        <thead><tr>
+          {% for key in fields[name] %}<th>{{ key }}</th>{% endfor %}
+        </tr></thead>
+        <tbody>
+          {% for doc in docs %}
+          <tr>
+            {% for key in fields[name] %}<td>{{ doc.get(key, "") }}</td>{% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="empty">(empty)</p>
+    {% endif %}
+  </section>
+  {% endfor %}
+</body>
+</html>
