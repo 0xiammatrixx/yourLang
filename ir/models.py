@@ -74,7 +74,7 @@ class RemoveOperation(BaseOperation):
 
     operation: Literal["remove"]
     source: str
-    condition: Condition
+    condition: Condition | None = None
 
 
 class MoveOperation(BaseOperation):
@@ -86,7 +86,7 @@ class MoveOperation(BaseOperation):
     operation: Literal["move"]
     source: str
     destination: str
-    condition: Condition
+    condition: Condition | None = None
 
 
 class CopyOperation(BaseOperation):
@@ -95,7 +95,7 @@ class CopyOperation(BaseOperation):
     operation: Literal["copy"]
     source: str
     destination: str
-    condition: Condition
+    condition: Condition | None = None
 
 
 class FindOperation(BaseOperation):
@@ -106,7 +106,7 @@ class FindOperation(BaseOperation):
 
     operation: Literal["find"]
     source: str
-    condition: Condition
+    condition: Condition | None = None
 
 
 class UpdateOperation(BaseOperation):
@@ -117,7 +117,7 @@ class UpdateOperation(BaseOperation):
 
     operation: Literal["update"]
     source: str
-    condition: Condition
+    condition: Condition | None = None
     set: dict[str, ScalarValue | bool] = Field(min_length=1)
 
 

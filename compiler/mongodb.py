@@ -67,8 +67,13 @@ class CompiledPlan:
         return asdict(self)
 
 
-def condition_to_filter(condition: Condition) -> dict[str, Any]:
-    """Translate one IR condition into a MongoDB filter expression."""
+def condition_to_filter(condition: Condition | None) -> dict[str, Any]:
+    """Translate one IR condition into a MongoDB filter expression.
+
+    None (no condition) means "match ALL records" and becomes an empty filter.
+    """
+    if condition is None:
+        return {}
     return {condition.field: {MONGO_OPERATOR[condition.operator]: condition.value}}
 
 

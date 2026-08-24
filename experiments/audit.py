@@ -57,7 +57,11 @@ def metric_paraphrases(data: dict[str, Any]) -> dict[str, Any]:
 def metric_ambiguity(data: dict[str, Any]) -> dict[str, Any]:
     det = data.get("detection", [])
     comp = data.get("completion", [])
-    asked = sum(1 for r in det if r["status"] == "needs_clarification")
+    asked = sum(
+        1
+        for r in det
+        if r["status"] in ("needs_clarification", "needs_confirmation")
+    )
     guessed = sum(1 for r in det if r["status"] == "executed")
     completed = sum(1 for r in comp if r["status"] == "executed")
     correct = sum(

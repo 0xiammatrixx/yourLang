@@ -25,6 +25,18 @@ def test_valid_move_passes():
     assert validate(command(MOVE)) is not None
 
 
+def test_move_without_condition_is_allowed():
+    validate(
+        command(
+            {
+                "operation": "move",
+                "source": "people",
+                "destination": "employees",
+            }
+        )
+    )
+
+
 def test_unknown_source_rejected():
     with pytest.raises(SemanticError):
         validate(command({**MOVE, "source": "banana"}))

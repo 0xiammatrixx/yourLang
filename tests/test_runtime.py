@@ -125,6 +125,22 @@ def test_copy_leaves_source_unchanged():
     assert len(store.find("pension", None)) == 2
 
 
+def test_copy_all_copies_everyone_and_keeps_source():
+    store = seeded_store()
+    plan = compile_operation(
+        command(
+            {
+                "operation": "copy",
+                "source": "people",
+                "destination": "employees",
+            }
+        )
+    )
+    execute_plan(plan, store)
+    assert len(store.find("people", None)) == 3
+    assert sorted(d["name"] for d in store.find("employees", None)) == ["Alice", "Ben", "David"]
+
+
 def test_create_then_collection_exists():
     store = seeded_store()
     plan = compile_operation(command({"operation": "create", "destination": "archive"}))

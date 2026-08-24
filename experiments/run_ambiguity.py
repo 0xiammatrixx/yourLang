@@ -37,7 +37,11 @@ def run_completion(
                 return _answer
 
             outcome = process_instruction(
-                case["instruction"], translator, store, clarify_fn=clarify
+                case["instruction"],
+                translator,
+                store,
+                clarify_fn=clarify,
+                confirm_fn=lambda q: True,
             )
             results.append(
                 {
@@ -54,17 +58,22 @@ def print_report(
     detection: list[dict[str, Any]], completion: list[dict[str, Any]]
 ) -> None:
     n = len(detection)
-    asked = sum(1 for r in detection if r["status"] == "needs_clarification")
+    asked = sum(
+        1
+        for r in detection
+        if r["status"] in ("needs_clarification", "needs_confirmation")
+    )
     guessed = sum(1 for r in detection if r["status"] == "executed")
     other = n - asked - guessed
 
     print(f"Ambiguity detection: {n} cases\n")
     for r in detection:
-        if r["status"] == "needs_clarification":
+        if r["status"] in ("needs_clarification", "needs_confirmation"):
             clarification = r["clarification"] or {}
             msg = clarification.get("message", "")
             missing = clarification.get("missing", [])
-            print(f"  {r['id']:<26} ✓ asked: \"{msg}\"  (missing: {', '.join(missing)})")
+            kind = "confirm" if r["status"] == "needs_confirmation" else "asked"
+            print(f"  {r['id']:<26} ✓ {kind}: \"{msg}\"  (missing: {', '.join(missing)})")
         elif r["status"] == "executed":
             print(f"  {r['id']:<26} ✗ GUESSED: {ir_key(r['ir'])}")
         else:

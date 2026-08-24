@@ -56,26 +56,36 @@ Rules:
    "above/more than/over/exceeds" -> ">", "at least" -> ">=",
    "below/less than/under" -> "<", "at most" -> "<=",
    "equals/is" -> "=", "not equal" -> "!=".
-4. If the instruction is ambiguous but you have a confident best guess, set
+4. Scope: if the instruction explicitly says all/everyone/everybody/everything
+   with no other criterion, set "condition" to null to match ALL records. If no
+   quantifier and no condition is given (e.g. "move people to pension"), the
+   scope is unclear — use "needs_confirmation" or "needs_clarification".
+5. Verb → operation: "copy/add/put/duplicate … without deleting or removing
+   from the source" maps to "copy" (the source is left unchanged).
+   "move/transfer" maps to "move" (source records are deleted). Never treat the
+   phrase "without deleting" as a filter on a "deleted" status or field.
+6. If the instruction is ambiguous but you have a confident best guess, set
    "status" to "needs_confirmation": return BOTH the best-guess "command" AND
    a "clarification" whose "message" asks the user to confirm, for example
    "Did you mean: move everyone aged above 60 to pension?". The system will
    ask the user to confirm before executing anything.
-5. If a required field cannot be determined and you do NOT have a reasonable
+7. If a required field cannot be determined and you do NOT have a reasonable
    guess (e.g. an undefined word such as "old"), set "status" to
    "needs_clarification" and list the missing field names in "missing".
-6. If the instruction does not match any supported operation, use
+8. If the instruction does not match any supported operation, use
    "needs_clarification".
-7. Respond with exactly one JSON object matching the schema; no prose.
-8. For "update", choose the field to change among the known fields of the source
-   collection (name, age, country, salary, status). Phrases like "mark as retired"
-   or "set to retired" mean: set the "status" field to the value "retired" —
-   never invent a new field named after the value.
-9. If the instruction contains several clauses joined by "but", "and", "unless"
-   or similar (for example "move X, but don't move Y"), every clause must be
-   captured by the representation. If clauses conflict with each other or cannot
-   all be represented, set "status" to "needs_clarification" and explain the
-   conflict in "message".
+9. Respond with exactly one JSON object matching the schema; no prose.
+10. For "update", choose the field to change among the known fields of the source
+    collection (name, age, country, salary, status). Verbs like "retire",
+    "mark as retired", "set to retired", or "deactivate" mean: set the "status"
+    field to the value "retired" (or "inactive" for "deactivate") — never invent
+    a new field named after the value, and never treat "retire" as a move,
+    delete, or copy into another collection.
+11. If the instruction contains several clauses joined by "but", "and", "unless"
+    or similar (for example "move X, but don't move Y"), every clause must be
+    captured by the representation. If clauses conflict with each other or cannot
+    all be represented, set "status" to "needs_clarification" and explain the
+    conflict in "message".
 
 Examples:
 Instruction: "Move all employees whose salary is below 30000 to pension."
@@ -90,6 +100,10 @@ Instruction: "Move all the seniors to pension."
 Response: {"status": "needs_confirmation", "command": {"operation": "move", "source": "people",
 "destination": "pension", "condition": {"field": "age", "operator": ">", "value": 60}},
 "clarification": {"message": "Did you mean: move everyone over 60 to pension?", "missing": ["condition.value"]}}
+
+Instruction: "Add everybody to the employees collection without deleting them from the previous collection."
+Response: {"status": "complete", "command": {"operation": "copy", "source": "people",
+"destination": "employees", "condition": null}}
 
 JSON Schema:
 {schema}

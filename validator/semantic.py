@@ -89,6 +89,8 @@ def _check_field_value(collection: str, field: str, value: Any) -> None:
 
 
 def _check_condition(collection: str, condition: Any) -> None:
+    if condition is None:
+        return  # no condition = match all records
     _check_field_value(collection, condition.field, condition.value)
 
 

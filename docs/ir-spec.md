@@ -34,6 +34,10 @@ All operations forbid unknown fields (`extra="forbid"`).
 | `find` | `source`, `condition` | return matching records (read-only) |
 | `update` | `source`, `condition`, `set` (≥1) | `set` maps field → value |
 
+`condition` may be `null` on `remove`/`move`/`copy`/`find`/`update`, meaning
+**match all records** — this is how "everybody"/"all" with no other criterion is
+represented. (A null condition compiles to an empty MongoDB filter `{}`.)
+
 ## `Condition`
 
 | Field | Type | Domain |

@@ -38,6 +38,24 @@ def test_condition_to_filter():
     assert condition_to_filter(condition) == {"age": {"$gt": 60}}
 
 
+def test_condition_to_filter_none_means_all():
+    assert condition_to_filter(None) == {}
+
+
+def test_copy_all_compiles_with_empty_filter():
+    plan = compile_operation(
+        command(
+            {
+                "operation": "copy",
+                "source": "people",
+                "destination": "employees",
+            }
+        )
+    )
+    assert [step.action for step in plan.steps] == ["find", "insert_many"]
+    assert plan.steps[0].filter == {}
+
+
 def test_move_compiles_to_three_steps():
     plan = compile_operation(command(MOVE))
     assert len(plan.steps) == 3

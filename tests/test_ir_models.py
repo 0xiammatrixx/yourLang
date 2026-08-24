@@ -123,3 +123,17 @@ def test_schema_is_exportable_and_contains_operations():
     for op in ("move", "find", "update", "create", "add", "remove", "copy"):
         assert op in dumped
     assert "Condition" in schema["$defs"]
+
+
+def test_condition_is_optional_for_all_records():
+    result = TranslationResult.model_validate(
+        {
+            "status": "complete",
+            "command": {
+                "operation": "copy",
+                "source": "people",
+                "destination": "employees",
+            },
+        }
+    )
+    assert result.command.condition is None
