@@ -1,0 +1,71 @@
+{
+  "paraphrases": {
+    "cases": 20,
+    "intents": 4,
+    "executed": 20,
+    "correct": 20,
+    "converged": 4
+  },
+  "ambiguity": {
+    "n": 4,
+    "asked": 4,
+    "guessed": 0,
+    "completed": 4,
+    "correct": 4
+  },
+  "adversarial": {
+    "n": 5,
+    "safe": 5,
+    "executed": 0
+  },
+  "baseline": {
+    "paraphrases": {
+      "direct": {
+        "executed": 16,
+        "correct": 14,
+        "asked": 0,
+        "errors": 4
+      },
+      "pipeline": {
+        "executed": 20,
+        "correct": 20,
+        "asked": 0,
+        "errors": 0
+      }
+    },
+    "ambiguity": {
+      "direct": {
+        "executed": 1,
+        "needs_clarification": 3,
+        "invalid": 0,
+        "error": 0
+      },
+      "pipeline": {
+        "executed": 0,
+        "needs_clarification": 4,
+        "invalid": 0,
+        "error": 0
+      }
+    },
+    "adversarial": {
+      "direct": {
+        "executed": 1,
+        "needs_clarification": 4,
+        "invalid": 0,
+        "error": 0
+      },
+      "pipeline": {
+        "executed": 0,
+        "needs_clarification": 5,
+        "invalid": 0,
+        "error": 0
+      }
+    }
+  },
+  "review": {
+    "n_correct": 20,
+    "false_rejections": 1,
+    "n_corrupt": 8,
+    "detected": 8
+  }
+}

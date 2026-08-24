@@ -1,0 +1,174 @@
+{
+  "correct": [
+    {
+      "id": "mv1a",
+      "instruction": "Move everyone aged above 60 to collection pension.",
+      "verdict": "APPROVED",
+      "reason": "The IR correctly captures the move operation, source, destination, and the condition age > 60, matching the instruction exactly."
+    },
+    {
+      "id": "mv1b",
+      "instruction": "Put all people older than sixty in the pension collection.",
+      "verdict": "APPROVED",
+      "reason": "The IR correctly captures the move operation from people to pension with the condition age > 60, matching 'older than sixty'."
+    },
+    {
+      "id": "mv1c",
+      "instruction": "Transfer users whose age exceeds 60 into pension.",
+      "verdict": "APPROVED",
+      "reason": "The IR correctly captures the move operation, source 'people', destination 'pension', and condition age > 60, matching the instruction exactly."
+    },
+    {
+      "id": "mv1d",
+      "instruction": "Take everybody over the age of 60 and move them to pension.",
+      "verdict": "APPROVED",
+      "reason": "The IR correctly captures the move operation, source, destination, and the condition age > 60, matching the instruction exactly."
+    },
+    {
+      "id": "mv1e",
+      "instruction": "Pension should contain all users with age greater than 60.",
+      "verdict": "APPROVED",
+      "reason": "The IR correctly captures the move operation from people to pension with the condition age > 60, matching the instruction."
+    },
+    {
+      "id": "rm1a",
+      "instruction": "Remove everyone younger than 18 from people.",
+      "verdict": "APPROVED",
+      "reason": "The IR correctly captures the remove operation on the people source with the condition age < 18, matching 'younger than 18'."
+    },
+    {
+      "id": "rm1b",
+      "instruction": "Delete all people under the age of 18.",
+      "verdict": "APPROVED",
+      "reason": "The IR correctly captures the delete operation on people with age less than 18, matching the instruction."
+    },
+    {
+      "id": "rm1c",
+      "instruction": "Take out anybody below 18 years old.",
+      "verdict": "APPROVED",
+      "reason": "The IR correctly captures the removal of people with age less than 18, matching the instruction's 'below 18 years old'."
+    },
+    {
+      "id": "rm1d",
+      "instruction": "Remove every person whose age is less than 18.",
+      "verdict": "APPROVED",
+      "reason": "The IR correctly captures the remove operation on people with age less than 18, matching the instruction exactly."
+    },
+    {
+      "id": "rm1e",
+      "instruction": "Drop all people that are not yet 18.",
+      "verdict": "REJECTED",
+      "reason": "The instruction says to drop people that are not yet 18, meaning those under 18. The IR removes people with age < 18, which is correct. However, the instruction implies keeping people who are 18 or older, so the condition should be age >= 18 to keep, but the operation is remove, so the condition should be age < 18 to remove. That matches. But the instruction says 'not yet 18' which is age < 18, so it's correct. Wait, the IR removes people with age < 18, which is exactly what is asked. So it's approved. But let me double-check: 'Drop all people that are not yet 18' means remove those under 18. The IR does that. So it's approved. However, the instruction might be interpreted as 'drop all people who are not yet 18' meaning remove those who are not 18 or older, i.e., remove those with age < 18. That's correct. So I'll approve."
+    },
+    {
+      "id": "fd1a",
+      "instruction": "Find everyone whose country is Nigeria.",
+      "verdict": "APPROVED",
+      "reason": "The IR captures the find operation on people with a condition that country equals Nigeria, matching the instruction exactly."
+    },
+    {
+      "id": "fd1b",
+      "instruction": "Show me all people from Nigeria.",
+      "verdict": "APPROVED",
+      "reason": "The IR captures the instruction to find all people from Nigeria by filtering the 'people' source on the 'country' field equal to 'Nigeria'."
+    },
+    {
+      "id": "fd1c",
+      "instruction": "List the people with country equal to Nigeria.",
+      "verdict": "APPROVED",
+      "reason": "The IR correctly captures the instruction to list people where country equals Nigeria, with no missing or extra elements."
+    },
+    {
+      "id": "fd1d",
+      "instruction": "Get all users that live in Nigeria.",
+      "verdict": "APPROVED",
+      "reason": "The IR captures the instruction to find users (people) living in Nigeria by filtering on country equals Nigeria."
+    },
+    {
+      "id": "fd1e",
+      "instruction": "Retrieve people whose country is Nigeria.",
+      "verdict": "APPROVED",
+      "reason": "The IR correctly captures the instruction to retrieve people where the country field equals Nigeria."
+    },
+    {
+      "id": "up1a",
+      "instruction": "Set status to retired for everyone aged at least 60 in people.",
+      "verdict": "APPROVED",
+      "reason": "The IR correctly captures the update operation on the 'people' source, sets 'status' to 'retired', and applies the condition 'age >= 60' which matches 'aged at least 60'."
+    },
+    {
+      "id": "up1b",
+      "instruction": "Mark everyone who is 60 or older as retired.",
+      "verdict": "APPROVED",
+      "reason": "The IR correctly captures the update operation, the condition (age >= 60), and the assignment of status to retired."
+    },
+    {
+      "id": "up1c",
+      "instruction": "Change the status field to retired for people aged 60 or more.",
+      "verdict": "APPROVED",
+      "reason": "The IR correctly captures the update operation, the condition (age >= 60), and the field assignment (status = retired)."
+    },
+    {
+      "id": "up1d",
+      "instruction": "Everyone in people whose age is 60 or above should have their status set to retired.",
+      "verdict": "APPROVED",
+      "reason": "The IR correctly captures the update operation on people with age >= 60, setting status to retired, matching the instruction exactly."
+    },
+    {
+      "id": "up1e",
+      "instruction": "Update people to retired status when age is at least 60.",
+      "verdict": "APPROVED",
+      "reason": "The IR correctly captures the update operation on people, the condition age >= 60, and setting status to retired."
+    }
+  ],
+  "corrupt": [
+    {
+      "id": "rev_off_by_one",
+      "instruction": "Move everyone aged at least 60 to pension.",
+      "verdict": "REJECTED",
+      "reason": "The instruction says 'at least 60', which means age >= 60, but the IR uses '>' (strictly greater than), excluding those exactly 60."
+    },
+    {
+      "id": "rev_wrong_direction",
+      "instruction": "Move everyone over 60 out of pension back to people.",
+      "verdict": "REJECTED",
+      "reason": "The IR reverses the source and destination: the instruction says move from pension to people, but the IR moves from people to pension."
+    },
+    {
+      "id": "rev_wrong_verb",
+      "instruction": "Copy everyone over 60 to pension.",
+      "verdict": "REJECTED",
+      "reason": "The instruction says 'copy', but the IR uses 'move', which removes from source instead of duplicating."
+    },
+    {
+      "id": "rev_wrong_operator",
+      "instruction": "Find people younger than 60.",
+      "verdict": "REJECTED",
+      "reason": "The operator direction is wrong: 'younger than 60' means age < 60, but the IR uses '>' (greater than)."
+    },
+    {
+      "id": "rev_wrong_field",
+      "instruction": "Retire everyone over 60.",
+      "verdict": "REJECTED",
+      "reason": "The IR incorrectly sets salary to 100000 instead of retiring the people (e.g., setting status to retired)."
+    },
+    {
+      "id": "rev_dropped_exception",
+      "instruction": "Move everyone over 60 to pension, except people named David.",
+      "verdict": "REJECTED",
+      "reason": "The IR omits the exception clause 'except people named David', which should exclude individuals with name 'David' from the move."
+    },
+    {
+      "id": "rev_threshold_swap",
+      "instruction": "Mark everyone with salary below 50000 as junior.",
+      "verdict": "REJECTED",
+      "reason": "The condition uses '>' (greater than) instead of '<' (less than), so it marks people with salary above 50000, not below."
+    },
+    {
+      "id": "rev_invented_threshold",
+      "instruction": "Move all the old people to pension.",
+      "verdict": "REJECTED",
+      "reason": "The instruction says 'old people' but does not specify an age threshold; the IR arbitrarily assumes age > 60, which is not stated."
+    }
+  ]
+}

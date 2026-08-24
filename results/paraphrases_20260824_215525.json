@@ -1,0 +1,1445 @@
+{
+  "results": [
+    {
+      "id": "mv1a",
+      "intent": "move_over_60_to_pension",
+      "expected_ir": {
+        "operation": "move",
+        "source": "people",
+        "destination": "pension",
+        "condition": {
+          "field": "age",
+          "operator": ">",
+          "value": 60
+        }
+      },
+      "expected_status": null,
+      "expected_ir_after_answer": null,
+      "answer": null,
+      "status": "executed",
+      "instruction": "Move everyone aged above 60 to collection pension.",
+      "rounds": 1,
+      "ir": {
+        "operation": "move",
+        "source": "people",
+        "destination": "pension",
+        "condition": {
+          "field": "age",
+          "operator": ">",
+          "value": 60
+        }
+      },
+      "plan": {
+        "steps": [
+          {
+            "action": "find",
+            "collection": "people",
+            "filter": {
+              "age": {
+                "$gt": 60
+              }
+            },
+            "documents": null,
+            "updates": null,
+            "store": "matched"
+          },
+          {
+            "action": "delete_many",
+            "collection": "people",
+            "filter": {
+              "age": {
+                "$gt": 60
+              }
+            },
+            "documents": null,
+            "updates": null,
+            "store": null
+          },
+          {
+            "action": "insert_many",
+            "collection": "pension",
+            "filter": null,
+            "documents": {
+              "$ref": "matched"
+            },
+            "updates": null,
+            "store": null
+          }
+        ],
+        "return_store": null
+      },
+      "execution": {
+        "result": null,
+        "log": [
+          {
+            "action": "find",
+            "collection": "people",
+            "matched": 2
+          },
+          {
+            "action": "delete_many",
+            "collection": "people",
+            "removed": 2
+          },
+          {
+            "action": "insert_many",
+            "collection": "pension",
+            "inserted": 2
+          }
+        ]
+      },
+      "clarification": null,
+      "error": null
+    },
+    {
+      "id": "mv1b",
+      "intent": "move_over_60_to_pension",
+      "expected_ir": {
+        "operation": "move",
+        "source": "people",
+        "destination": "pension",
+        "condition": {
+          "field": "age",
+          "operator": ">",
+          "value": 60
+        }
+      },
+      "expected_status": null,
+      "expected_ir_after_answer": null,
+      "answer": null,
+      "status": "executed",
+      "instruction": "Put all people older than sixty in the pension collection.",
+      "rounds": 1,
+      "ir": {
+        "operation": "move",
+        "source": "people",
+        "destination": "pension",
+        "condition": {
+          "field": "age",
+          "operator": ">",
+          "value": 60
+        }
+      },
+      "plan": {
+        "steps": [
+          {
+            "action": "find",
+            "collection": "people",
+            "filter": {
+              "age": {
+                "$gt": 60
+              }
+            },
+            "documents": null,
+            "updates": null,
+            "store": "matched"
+          },
+          {
+            "action": "delete_many",
+            "collection": "people",
+            "filter": {
+              "age": {
+                "$gt": 60
+              }
+            },
+            "documents": null,
+            "updates": null,
+            "store": null
+          },
+          {
+            "action": "insert_many",
+            "collection": "pension",
+            "filter": null,
+            "documents": {
+              "$ref": "matched"
+            },
+            "updates": null,
+            "store": null
+          }
+        ],
+        "return_store": null
+      },
+      "execution": {
+        "result": null,
+        "log": [
+          {
+            "action": "find",
+            "collection": "people",
+            "matched": 2
+          },
+          {
+            "action": "delete_many",
+            "collection": "people",
+            "removed": 2
+          },
+          {
+            "action": "insert_many",
+            "collection": "pension",
+            "inserted": 2
+          }
+        ]
+      },
+      "clarification": null,
+      "error": null
+    },
+    {
+      "id": "mv1c",
+      "intent": "move_over_60_to_pension",
+      "expected_ir": {
+        "operation": "move",
+        "source": "people",
+        "destination": "pension",
+        "condition": {
+          "field": "age",
+          "operator": ">",
+          "value": 60
+        }
+      },
+      "expected_status": null,
+      "expected_ir_after_answer": null,
+      "answer": null,
+      "status": "executed",
+      "instruction": "Transfer users whose age exceeds 60 into pension.",
+      "rounds": 1,
+      "ir": {
+        "operation": "move",
+        "source": "people",
+        "destination": "pension",
+        "condition": {
+          "field": "age",
+          "operator": ">",
+          "value": 60
+        }
+      },
+      "plan": {
+        "steps": [
+          {
+            "action": "find",
+            "collection": "people",
+            "filter": {
+              "age": {
+                "$gt": 60
+              }
+            },
+            "documents": null,
+            "updates": null,
+            "store": "matched"
+          },
+          {
+            "action": "delete_many",
+            "collection": "people",
+            "filter": {
+              "age": {
+                "$gt": 60
+              }
+            },
+            "documents": null,
+            "updates": null,
+            "store": null
+          },
+          {
+            "action": "insert_many",
+            "collection": "pension",
+            "filter": null,
+            "documents": {
+              "$ref": "matched"
+            },
+            "updates": null,
+            "store": null
+          }
+        ],
+        "return_store": null
+      },
+      "execution": {
+        "result": null,
+        "log": [
+          {
+            "action": "find",
+            "collection": "people",
+            "matched": 2
+          },
+          {
+            "action": "delete_many",
+            "collection": "people",
+            "removed": 2
+          },
+          {
+            "action": "insert_many",
+            "collection": "pension",
+            "inserted": 2
+          }
+        ]
+      },
+      "clarification": null,
+      "error": null
+    },
+    {
+      "id": "mv1d",
+      "intent": "move_over_60_to_pension",
+      "expected_ir": {
+        "operation": "move",
+        "source": "people",
+        "destination": "pension",
+        "condition": {
+          "field": "age",
+          "operator": ">",
+          "value": 60
+        }
+      },
+      "expected_status": null,
+      "expected_ir_after_answer": null,
+      "answer": null,
+      "status": "executed",
+      "instruction": "Take everybody over the age of 60 and move them to pension.",
+      "rounds": 1,
+      "ir": {
+        "operation": "move",
+        "source": "people",
+        "destination": "pension",
+        "condition": {
+          "field": "age",
+          "operator": ">",
+          "value": 60
+        }
+      },
+      "plan": {
+        "steps": [
+          {
+            "action": "find",
+            "collection": "people",
+            "filter": {
+              "age": {
+                "$gt": 60
+              }
+            },
+            "documents": null,
+            "updates": null,
+            "store": "matched"
+          },
+          {
+            "action": "delete_many",
+            "collection": "people",
+            "filter": {
+              "age": {
+                "$gt": 60
+              }
+            },
+            "documents": null,
+            "updates": null,
+            "store": null
+          },
+          {
+            "action": "insert_many",
+            "collection": "pension",
+            "filter": null,
+            "documents": {
+              "$ref": "matched"
+            },
+            "updates": null,
+            "store": null
+          }
+        ],
+        "return_store": null
+      },
+      "execution": {
+        "result": null,
+        "log": [
+          {
+            "action": "find",
+            "collection": "people",
+            "matched": 2
+          },
+          {
+            "action": "delete_many",
+            "collection": "people",
+            "removed": 2
+          },
+          {
+            "action": "insert_many",
+            "collection": "pension",
+            "inserted": 2
+          }
+        ]
+      },
+      "clarification": null,
+      "error": null
+    },
+    {
+      "id": "mv1e",
+      "intent": "move_over_60_to_pension",
+      "expected_ir": {
+        "operation": "move",
+        "source": "people",
+        "destination": "pension",
+        "condition": {
+          "field": "age",
+          "operator": ">",
+          "value": 60
+        }
+      },
+      "expected_status": null,
+      "expected_ir_after_answer": null,
+      "answer": null,
+      "status": "executed",
+      "instruction": "Pension should contain all users with age greater than 60.",
+      "rounds": 1,
+      "ir": {
+        "operation": "move",
+        "source": "people",
+        "destination": "pension",
+        "condition": {
+          "field": "age",
+          "operator": ">",
+          "value": 60
+        }
+      },
+      "plan": {
+        "steps": [
+          {
+            "action": "find",
+            "collection": "people",
+            "filter": {
+              "age": {
+                "$gt": 60
+              }
+            },
+            "documents": null,
+            "updates": null,
+            "store": "matched"
+          },
+          {
+            "action": "delete_many",
+            "collection": "people",
+            "filter": {
+              "age": {
+                "$gt": 60
+              }
+            },
+            "documents": null,
+            "updates": null,
+            "store": null
+          },
+          {
+            "action": "insert_many",
+            "collection": "pension",
+            "filter": null,
+            "documents": {
+              "$ref": "matched"
+            },
+            "updates": null,
+            "store": null
+          }
+        ],
+        "return_store": null
+      },
+      "execution": {
+        "result": null,
+        "log": [
+          {
+            "action": "find",
+            "collection": "people",
+            "matched": 2
+          },
+          {
+            "action": "delete_many",
+            "collection": "people",
+            "removed": 2
+          },
+          {
+            "action": "insert_many",
+            "collection": "pension",
+            "inserted": 2
+          }
+        ]
+      },
+      "clarification": null,
+      "error": null
+    },
+    {
+      "id": "rm1a",
+      "intent": "remove_under_18",
+      "expected_ir": {
+        "operation": "remove",
+        "source": "people",
+        "condition": {
+          "field": "age",
+          "operator": "<",
+          "value": 18
+        }
+      },
+      "expected_status": null,
+      "expected_ir_after_answer": null,
+      "answer": null,
+      "status": "executed",
+      "instruction": "Remove everyone younger than 18 from people.",
+      "rounds": 1,
+      "ir": {
+        "operation": "remove",
+        "source": "people",
+        "condition": {
+          "field": "age",
+          "operator": "<",
+          "value": 18
+        }
+      },
+      "plan": {
+        "steps": [
+          {
+            "action": "delete_many",
+            "collection": "people",
+            "filter": {
+              "age": {
+                "$lt": 18
+              }
+            },
+            "documents": null,
+            "updates": null,
+            "store": null
+          }
+        ],
+        "return_store": null
+      },
+      "execution": {
+        "result": null,
+        "log": [
+          {
+            "action": "delete_many",
+            "collection": "people",
+            "removed": 0
+          }
+        ]
+      },
+      "clarification": null,
+      "error": null
+    },
+    {
+      "id": "rm1b",
+      "intent": "remove_under_18",
+      "expected_ir": {
+        "operation": "remove",
+        "source": "people",
+        "condition": {
+          "field": "age",
+          "operator": "<",
+          "value": 18
+        }
+      },
+      "expected_status": null,
+      "expected_ir_after_answer": null,
+      "answer": null,
+      "status": "executed",
+      "instruction": "Delete all people under the age of 18.",
+      "rounds": 1,
+      "ir": {
+        "operation": "remove",
+        "source": "people",
+        "condition": {
+          "field": "age",
+          "operator": "<",
+          "value": 18
+        }
+      },
+      "plan": {
+        "steps": [
+          {
+            "action": "delete_many",
+            "collection": "people",
+            "filter": {
+              "age": {
+                "$lt": 18
+              }
+            },
+            "documents": null,
+            "updates": null,
+            "store": null
+          }
+        ],
+        "return_store": null
+      },
+      "execution": {
+        "result": null,
+        "log": [
+          {
+            "action": "delete_many",
+            "collection": "people",
+            "removed": 0
+          }
+        ]
+      },
+      "clarification": null,
+      "error": null
+    },
+    {
+      "id": "rm1c",
+      "intent": "remove_under_18",
+      "expected_ir": {
+        "operation": "remove",
+        "source": "people",
+        "condition": {
+          "field": "age",
+          "operator": "<",
+          "value": 18
+        }
+      },
+      "expected_status": null,
+      "expected_ir_after_answer": null,
+      "answer": null,
+      "status": "needs_clarification",
+      "instruction": "Take out anybody below 18 years old.",
+      "rounds": 1,
+      "ir": null,
+      "plan": null,
+      "execution": null,
+      "clarification": {
+        "message": "Which collection should the removal be applied to?",
+        "missing": [
+          "command.source"
+        ]
+      },
+      "error": null
+    },
+    {
+      "id": "rm1d",
+      "intent": "remove_under_18",
+      "expected_ir": {
+        "operation": "remove",
+        "source": "people",
+        "condition": {
+          "field": "age",
+          "operator": "<",
+          "value": 18
+        }
+      },
+      "expected_status": null,
+      "expected_ir_after_answer": null,
+      "answer": null,
+      "status": "executed",
+      "instruction": "Remove every person whose age is less than 18.",
+      "rounds": 1,
+      "ir": {
+        "operation": "remove",
+        "source": "people",
+        "condition": {
+          "field": "age",
+          "operator": "<",
+          "value": 18
+        }
+      },
+      "plan": {
+        "steps": [
+          {
+            "action": "delete_many",
+            "collection": "people",
+            "filter": {
+              "age": {
+                "$lt": 18
+              }
+            },
+            "documents": null,
+            "updates": null,
+            "store": null
+          }
+        ],
+        "return_store": null
+      },
+      "execution": {
+        "result": null,
+        "log": [
+          {
+            "action": "delete_many",
+            "collection": "people",
+            "removed": 0
+          }
+        ]
+      },
+      "clarification": null,
+      "error": null
+    },
+    {
+      "id": "rm1e",
+      "intent": "remove_under_18",
+      "expected_ir": {
+        "operation": "remove",
+        "source": "people",
+        "condition": {
+          "field": "age",
+          "operator": "<",
+          "value": 18
+        }
+      },
+      "expected_status": null,
+      "expected_ir_after_answer": null,
+      "answer": null,
+      "status": "executed",
+      "instruction": "Drop all people that are not yet 18.",
+      "rounds": 1,
+      "ir": {
+        "operation": "remove",
+        "source": "people",
+        "condition": {
+          "field": "age",
+          "operator": "<",
+          "value": 18
+        }
+      },
+      "plan": {
+        "steps": [
+          {
+            "action": "delete_many",
+            "collection": "people",
+            "filter": {
+              "age": {
+                "$lt": 18
+              }
+            },
+            "documents": null,
+            "updates": null,
+            "store": null
+          }
+        ],
+        "return_store": null
+      },
+      "execution": {
+        "result": null,
+        "log": [
+          {
+            "action": "delete_many",
+            "collection": "people",
+            "removed": 0
+          }
+        ]
+      },
+      "clarification": null,
+      "error": null
+    },
+    {
+      "id": "fd1a",
+      "intent": "find_people_in_nigeria",
+      "expected_ir": {
+        "operation": "find",
+        "source": "people",
+        "condition": {
+          "field": "country",
+          "operator": "=",
+          "value": "Nigeria"
+        }
+      },
+      "expected_status": null,
+      "expected_ir_after_answer": null,
+      "answer": null,
+      "status": "executed",
+      "instruction": "Find everyone whose country is Nigeria.",
+      "rounds": 1,
+      "ir": {
+        "operation": "find",
+        "source": "people",
+        "condition": {
+          "field": "country",
+          "operator": "=",
+          "value": "Nigeria"
+        }
+      },
+      "plan": {
+        "steps": [
+          {
+            "action": "find",
+            "collection": "people",
+            "filter": {
+              "country": {
+                "$eq": "Nigeria"
+              }
+            },
+            "documents": null,
+            "updates": null,
+            "store": "result"
+          }
+        ],
+        "return_store": "result"
+      },
+      "execution": {
+        "result": [
+          {
+            "name": "David",
+            "age": 30,
+            "country": "Nigeria",
+            "salary": 50000.0,
+            "status": "active"
+          },
+          {
+            "name": "Ben",
+            "age": 70,
+            "country": "Nigeria",
+            "salary": 90000.0,
+            "status": "active"
+          }
+        ],
+        "log": [
+          {
+            "action": "find",
+            "collection": "people",
+            "matched": 2
+          }
+        ]
+      },
+      "clarification": null,
+      "error": null
+    },
+    {
+      "id": "fd1b",
+      "intent": "find_people_in_nigeria",
+      "expected_ir": {
+        "operation": "find",
+        "source": "people",
+        "condition": {
+          "field": "country",
+          "operator": "=",
+          "value": "Nigeria"
+        }
+      },
+      "expected_status": null,
+      "expected_ir_after_answer": null,
+      "answer": null,
+      "status": "executed",
+      "instruction": "Show me all people from Nigeria.",
+      "rounds": 1,
+      "ir": {
+        "operation": "find",
+        "source": "people",
+        "condition": {
+          "field": "country",
+          "operator": "=",
+          "value": "Nigeria"
+        }
+      },
+      "plan": {
+        "steps": [
+          {
+            "action": "find",
+            "collection": "people",
+            "filter": {
+              "country": {
+                "$eq": "Nigeria"
+              }
+            },
+            "documents": null,
+            "updates": null,
+            "store": "result"
+          }
+        ],
+        "return_store": "result"
+      },
+      "execution": {
+        "result": [
+          {
+            "name": "David",
+            "age": 30,
+            "country": "Nigeria",
+            "salary": 50000.0,
+            "status": "active"
+          },
+          {
+            "name": "Ben",
+            "age": 70,
+            "country": "Nigeria",
+            "salary": 90000.0,
+            "status": "active"
+          }
+        ],
+        "log": [
+          {
+            "action": "find",
+            "collection": "people",
+            "matched": 2
+          }
+        ]
+      },
+      "clarification": null,
+      "error": null
+    },
+    {
+      "id": "fd1c",
+      "intent": "find_people_in_nigeria",
+      "expected_ir": {
+        "operation": "find",
+        "source": "people",
+        "condition": {
+          "field": "country",
+          "operator": "=",
+          "value": "Nigeria"
+        }
+      },
+      "expected_status": null,
+      "expected_ir_after_answer": null,
+      "answer": null,
+      "status": "executed",
+      "instruction": "List the people with country equal to Nigeria.",
+      "rounds": 1,
+      "ir": {
+        "operation": "find",
+        "source": "people",
+        "condition": {
+          "field": "country",
+          "operator": "=",
+          "value": "Nigeria"
+        }
+      },
+      "plan": {
+        "steps": [
+          {
+            "action": "find",
+            "collection": "people",
+            "filter": {
+              "country": {
+                "$eq": "Nigeria"
+              }
+            },
+            "documents": null,
+            "updates": null,
+            "store": "result"
+          }
+        ],
+        "return_store": "result"
+      },
+      "execution": {
+        "result": [
+          {
+            "name": "David",
+            "age": 30,
+            "country": "Nigeria",
+            "salary": 50000.0,
+            "status": "active"
+          },
+          {
+            "name": "Ben",
+            "age": 70,
+            "country": "Nigeria",
+            "salary": 90000.0,
+            "status": "active"
+          }
+        ],
+        "log": [
+          {
+            "action": "find",
+            "collection": "people",
+            "matched": 2
+          }
+        ]
+      },
+      "clarification": null,
+      "error": null
+    },
+    {
+      "id": "fd1d",
+      "intent": "find_people_in_nigeria",
+      "expected_ir": {
+        "operation": "find",
+        "source": "people",
+        "condition": {
+          "field": "country",
+          "operator": "=",
+          "value": "Nigeria"
+        }
+      },
+      "expected_status": null,
+      "expected_ir_after_answer": null,
+      "answer": null,
+      "status": "executed",
+      "instruction": "Get all users that live in Nigeria.",
+      "rounds": 1,
+      "ir": {
+        "operation": "find",
+        "source": "people",
+        "condition": {
+          "field": "country",
+          "operator": "=",
+          "value": "Nigeria"
+        }
+      },
+      "plan": {
+        "steps": [
+          {
+            "action": "find",
+            "collection": "people",
+            "filter": {
+              "country": {
+                "$eq": "Nigeria"
+              }
+            },
+            "documents": null,
+            "updates": null,
+            "store": "result"
+          }
+        ],
+        "return_store": "result"
+      },
+      "execution": {
+        "result": [
+          {
+            "name": "David",
+            "age": 30,
+            "country": "Nigeria",
+            "salary": 50000.0,
+            "status": "active"
+          },
+          {
+            "name": "Ben",
+            "age": 70,
+            "country": "Nigeria",
+            "salary": 90000.0,
+            "status": "active"
+          }
+        ],
+        "log": [
+          {
+            "action": "find",
+            "collection": "people",
+            "matched": 2
+          }
+        ]
+      },
+      "clarification": null,
+      "error": null
+    },
+    {
+      "id": "fd1e",
+      "intent": "find_people_in_nigeria",
+      "expected_ir": {
+        "operation": "find",
+        "source": "people",
+        "condition": {
+          "field": "country",
+          "operator": "=",
+          "value": "Nigeria"
+        }
+      },
+      "expected_status": null,
+      "expected_ir_after_answer": null,
+      "answer": null,
+      "status": "executed",
+      "instruction": "Retrieve people whose country is Nigeria.",
+      "rounds": 1,
+      "ir": {
+        "operation": "find",
+        "source": "people",
+        "condition": {
+          "field": "country",
+          "operator": "=",
+          "value": "Nigeria"
+        }
+      },
+      "plan": {
+        "steps": [
+          {
+            "action": "find",
+            "collection": "people",
+            "filter": {
+              "country": {
+                "$eq": "Nigeria"
+              }
+            },
+            "documents": null,
+            "updates": null,
+            "store": "result"
+          }
+        ],
+        "return_store": "result"
+      },
+      "execution": {
+        "result": [
+          {
+            "name": "David",
+            "age": 30,
+            "country": "Nigeria",
+            "salary": 50000.0,
+            "status": "active"
+          },
+          {
+            "name": "Ben",
+            "age": 70,
+            "country": "Nigeria",
+            "salary": 90000.0,
+            "status": "active"
+          }
+        ],
+        "log": [
+          {
+            "action": "find",
+            "collection": "people",
+            "matched": 2
+          }
+        ]
+      },
+      "clarification": null,
+      "error": null
+    },
+    {
+      "id": "up1a",
+      "intent": "mark_60_plus_as_retired",
+      "expected_ir": {
+        "operation": "update",
+        "source": "people",
+        "condition": {
+          "field": "age",
+          "operator": ">=",
+          "value": 60
+        },
+        "set": {
+          "status": "retired"
+        }
+      },
+      "expected_status": null,
+      "expected_ir_after_answer": null,
+      "answer": null,
+      "status": "executed",
+      "instruction": "Set status to retired for everyone aged at least 60 in people.",
+      "rounds": 1,
+      "ir": {
+        "operation": "update",
+        "source": "people",
+        "condition": {
+          "field": "age",
+          "operator": ">=",
+          "value": 60
+        },
+        "set": {
+          "status": "retired"
+        }
+      },
+      "plan": {
+        "steps": [
+          {
+            "action": "update_many",
+            "collection": "people",
+            "filter": {
+              "age": {
+                "$gte": 60
+              }
+            },
+            "documents": null,
+            "updates": {
+              "$set": {
+                "status": "retired"
+              }
+            },
+            "store": null
+          }
+        ],
+        "return_store": null
+      },
+      "execution": {
+        "result": null,
+        "log": [
+          {
+            "action": "update_many",
+            "collection": "people",
+            "modified": 2
+          }
+        ]
+      },
+      "clarification": null,
+      "error": null
+    },
+    {
+      "id": "up1b",
+      "intent": "mark_60_plus_as_retired",
+      "expected_ir": {
+        "operation": "update",
+        "source": "people",
+        "condition": {
+          "field": "age",
+          "operator": ">=",
+          "value": 60
+        },
+        "set": {
+          "status": "retired"
+        }
+      },
+      "expected_status": null,
+      "expected_ir_after_answer": null,
+      "answer": null,
+      "status": "executed",
+      "instruction": "Mark everyone who is 60 or older as retired.",
+      "rounds": 1,
+      "ir": {
+        "operation": "update",
+        "source": "people",
+        "condition": {
+          "field": "age",
+          "operator": ">=",
+          "value": 60
+        },
+        "set": {
+          "status": "retired"
+        }
+      },
+      "plan": {
+        "steps": [
+          {
+            "action": "update_many",
+            "collection": "people",
+            "filter": {
+              "age": {
+                "$gte": 60
+              }
+            },
+            "documents": null,
+            "updates": {
+              "$set": {
+                "status": "retired"
+              }
+            },
+            "store": null
+          }
+        ],
+        "return_store": null
+      },
+      "execution": {
+        "result": null,
+        "log": [
+          {
+            "action": "update_many",
+            "collection": "people",
+            "modified": 2
+          }
+        ]
+      },
+      "clarification": null,
+      "error": null
+    },
+    {
+      "id": "up1c",
+      "intent": "mark_60_plus_as_retired",
+      "expected_ir": {
+        "operation": "update",
+        "source": "people",
+        "condition": {
+          "field": "age",
+          "operator": ">=",
+          "value": 60
+        },
+        "set": {
+          "status": "retired"
+        }
+      },
+      "expected_status": null,
+      "expected_ir_after_answer": null,
+      "answer": null,
+      "status": "executed",
+      "instruction": "Change the status field to retired for people aged 60 or more.",
+      "rounds": 1,
+      "ir": {
+        "operation": "update",
+        "source": "people",
+        "condition": {
+          "field": "age",
+          "operator": ">=",
+          "value": 60
+        },
+        "set": {
+          "status": "retired"
+        }
+      },
+      "plan": {
+        "steps": [
+          {
+            "action": "update_many",
+            "collection": "people",
+            "filter": {
+              "age": {
+                "$gte": 60
+              }
+            },
+            "documents": null,
+            "updates": {
+              "$set": {
+                "status": "retired"
+              }
+            },
+            "store": null
+          }
+        ],
+        "return_store": null
+      },
+      "execution": {
+        "result": null,
+        "log": [
+          {
+            "action": "update_many",
+            "collection": "people",
+            "modified": 2
+          }
+        ]
+      },
+      "clarification": null,
+      "error": null
+    },
+    {
+      "id": "up1d",
+      "intent": "mark_60_plus_as_retired",
+      "expected_ir": {
+        "operation": "update",
+        "source": "people",
+        "condition": {
+          "field": "age",
+          "operator": ">=",
+          "value": 60
+        },
+        "set": {
+          "status": "retired"
+        }
+      },
+      "expected_status": null,
+      "expected_ir_after_answer": null,
+      "answer": null,
+      "status": "executed",
+      "instruction": "Everyone in people whose age is 60 or above should have their status set to retired.",
+      "rounds": 1,
+      "ir": {
+        "operation": "update",
+        "source": "people",
+        "condition": {
+          "field": "age",
+          "operator": ">=",
+          "value": 60
+        },
+        "set": {
+          "status": "retired"
+        }
+      },
+      "plan": {
+        "steps": [
+          {
+            "action": "update_many",
+            "collection": "people",
+            "filter": {
+              "age": {
+                "$gte": 60
+              }
+            },
+            "documents": null,
+            "updates": {
+              "$set": {
+                "status": "retired"
+              }
+            },
+            "store": null
+          }
+        ],
+        "return_store": null
+      },
+      "execution": {
+        "result": null,
+        "log": [
+          {
+            "action": "update_many",
+            "collection": "people",
+            "modified": 2
+          }
+        ]
+      },
+      "clarification": null,
+      "error": null
+    },
+    {
+      "id": "up1e",
+      "intent": "mark_60_plus_as_retired",
+      "expected_ir": {
+        "operation": "update",
+        "source": "people",
+        "condition": {
+          "field": "age",
+          "operator": ">=",
+          "value": 60
+        },
+        "set": {
+          "status": "retired"
+        }
+      },
+      "expected_status": null,
+      "expected_ir_after_answer": null,
+      "answer": null,
+      "status": "executed",
+      "instruction": "Update people to retired status when age is at least 60.",
+      "rounds": 1,
+      "ir": {
+        "operation": "update",
+        "source": "people",
+        "condition": {
+          "field": "age",
+          "operator": ">=",
+          "value": 60
+        },
+        "set": {
+          "status": "retired"
+        }
+      },
+      "plan": {
+        "steps": [
+          {
+            "action": "update_many",
+            "collection": "people",
+            "filter": {
+              "age": {
+                "$gte": 60
+              }
+            },
+            "documents": null,
+            "updates": {
+              "$set": {
+                "status": "retired"
+              }
+            },
+            "store": null
+          }
+        ],
+        "return_store": null
+      },
+      "execution": {
+        "result": null,
+        "log": [
+          {
+            "action": "update_many",
+            "collection": "people",
+            "modified": 2
+          }
+        ]
+      },
+      "clarification": null,
+      "error": null
+    }
+  ],
+  "summary": [
+    {
+      "intent": "move_over_60_to_pension",
+      "phrasings": 5,
+      "executed": 5,
+      "distinct_irs": 1,
+      "converged": true,
+      "all_match_expected": true
+    },
+    {
+      "intent": "remove_under_18",
+      "phrasings": 5,
+      "executed": 4,
+      "distinct_irs": 1,
+      "converged": false,
+      "all_match_expected": true
+    },
+    {
+      "intent": "find_people_in_nigeria",
+      "phrasings": 5,
+      "executed": 5,
+      "distinct_irs": 1,
+      "converged": true,
+      "all_match_expected": true
+    },
+    {
+      "intent": "mark_60_plus_as_retired",
+      "phrasings": 5,
+      "executed": 5,
+      "distinct_irs": 1,
+      "converged": true,
+      "all_match_expected": true
+    }
+  ]
+}

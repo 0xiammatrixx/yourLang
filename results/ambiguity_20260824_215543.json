@@ -1,0 +1,458 @@
+{
+  "detection": [
+    {
+      "id": "amb_old_people",
+      "intent": "ambiguity_old_people",
+      "expected_ir": null,
+      "expected_status": "needs_clarification",
+      "expected_ir_after_answer": {
+        "operation": "move",
+        "source": "people",
+        "destination": "pension",
+        "condition": {
+          "field": "age",
+          "operator": ">",
+          "value": 60
+        }
+      },
+      "answer": "60",
+      "status": "needs_clarification",
+      "instruction": "Move all the old people to pension.",
+      "rounds": 1,
+      "ir": null,
+      "plan": null,
+      "execution": null,
+      "clarification": {
+        "message": "What does 'old' mean? Please specify an age threshold or condition.",
+        "missing": [
+          "condition.field",
+          "condition.value"
+        ]
+      },
+      "error": null
+    },
+    {
+      "id": "amb_missing_condition",
+      "intent": "ambiguity_missing_condition",
+      "expected_ir": null,
+      "expected_status": "needs_clarification",
+      "expected_ir_after_answer": {
+        "operation": "move",
+        "source": "people",
+        "destination": "pension",
+        "condition": {
+          "field": "age",
+          "operator": ">",
+          "value": 60
+        }
+      },
+      "answer": "everyone over 60",
+      "status": "needs_clarification",
+      "instruction": "Move people to pension.",
+      "rounds": 1,
+      "ir": null,
+      "plan": null,
+      "execution": null,
+      "clarification": {
+        "message": "Which people should be moved? Please specify a condition (e.g., age above 60).",
+        "missing": [
+          "command.condition"
+        ]
+      },
+      "error": null
+    },
+    {
+      "id": "amb_unknown_word",
+      "intent": "ambiguity_unknown_word",
+      "expected_ir": null,
+      "expected_status": "needs_clarification",
+      "expected_ir_after_answer": {
+        "operation": "move",
+        "source": "people",
+        "destination": "pension",
+        "condition": {
+          "field": "age",
+          "operator": ">",
+          "value": 60
+        }
+      },
+      "answer": "seasoned means over 60 years old",
+      "status": "needs_clarification",
+      "instruction": "Move all the seasoned people to pension.",
+      "rounds": 1,
+      "ir": null,
+      "plan": null,
+      "execution": null,
+      "clarification": {
+        "message": "What does 'seasoned' mean? Please specify a condition (e.g., age above 60).",
+        "missing": [
+          "condition.field",
+          "condition.value"
+        ]
+      },
+      "error": null
+    },
+    {
+      "id": "amb_no_threshold",
+      "intent": "ambiguity_no_threshold",
+      "expected_ir": null,
+      "expected_status": "needs_clarification",
+      "expected_ir_after_answer": {
+        "operation": "update",
+        "source": "people",
+        "condition": {
+          "field": "salary",
+          "operator": ">",
+          "value": 100000
+        },
+        "set": {
+          "status": "retired"
+        }
+      },
+      "answer": "salary above 100000",
+      "status": "needs_clarification",
+      "instruction": "Retire everyone with a high salary.",
+      "rounds": 1,
+      "ir": null,
+      "plan": null,
+      "execution": null,
+      "clarification": {
+        "message": "What salary threshold defines 'high'?",
+        "missing": [
+          "condition.value"
+        ]
+      },
+      "error": null
+    }
+  ],
+  "completion": [
+    {
+      "id": "amb_old_people",
+      "answer": "60",
+      "expected_ir_after_answer": {
+        "operation": "move",
+        "source": "people",
+        "destination": "pension",
+        "condition": {
+          "field": "age",
+          "operator": ">",
+          "value": 60
+        }
+      },
+      "status": "executed",
+      "instruction": "Move all the old people to pension.",
+      "rounds": 2,
+      "ir": {
+        "operation": "move",
+        "source": "people",
+        "destination": "pension",
+        "condition": {
+          "field": "age",
+          "operator": ">",
+          "value": 60
+        }
+      },
+      "plan": {
+        "steps": [
+          {
+            "action": "find",
+            "collection": "people",
+            "filter": {
+              "age": {
+                "$gt": 60
+              }
+            },
+            "documents": null,
+            "updates": null,
+            "store": "matched"
+          },
+          {
+            "action": "delete_many",
+            "collection": "people",
+            "filter": {
+              "age": {
+                "$gt": 60
+              }
+            },
+            "documents": null,
+            "updates": null,
+            "store": null
+          },
+          {
+            "action": "insert_many",
+            "collection": "pension",
+            "filter": null,
+            "documents": {
+              "$ref": "matched"
+            },
+            "updates": null,
+            "store": null
+          }
+        ],
+        "return_store": null
+      },
+      "execution": {
+        "result": null,
+        "log": [
+          {
+            "action": "find",
+            "collection": "people",
+            "matched": 2
+          },
+          {
+            "action": "delete_many",
+            "collection": "people",
+            "removed": 2
+          },
+          {
+            "action": "insert_many",
+            "collection": "pension",
+            "inserted": 2
+          }
+        ]
+      },
+      "clarification": null,
+      "error": null
+    },
+    {
+      "id": "amb_missing_condition",
+      "answer": "everyone over 60",
+      "expected_ir_after_answer": {
+        "operation": "move",
+        "source": "people",
+        "destination": "pension",
+        "condition": {
+          "field": "age",
+          "operator": ">",
+          "value": 60
+        }
+      },
+      "status": "executed",
+      "instruction": "Move people to pension.",
+      "rounds": 2,
+      "ir": {
+        "operation": "move",
+        "source": "people",
+        "destination": "pension",
+        "condition": {
+          "field": "age",
+          "operator": ">",
+          "value": 60
+        }
+      },
+      "plan": {
+        "steps": [
+          {
+            "action": "find",
+            "collection": "people",
+            "filter": {
+              "age": {
+                "$gt": 60
+              }
+            },
+            "documents": null,
+            "updates": null,
+            "store": "matched"
+          },
+          {
+            "action": "delete_many",
+            "collection": "people",
+            "filter": {
+              "age": {
+                "$gt": 60
+              }
+            },
+            "documents": null,
+            "updates": null,
+            "store": null
+          },
+          {
+            "action": "insert_many",
+            "collection": "pension",
+            "filter": null,
+            "documents": {
+              "$ref": "matched"
+            },
+            "updates": null,
+            "store": null
+          }
+        ],
+        "return_store": null
+      },
+      "execution": {
+        "result": null,
+        "log": [
+          {
+            "action": "find",
+            "collection": "people",
+            "matched": 2
+          },
+          {
+            "action": "delete_many",
+            "collection": "people",
+            "removed": 2
+          },
+          {
+            "action": "insert_many",
+            "collection": "pension",
+            "inserted": 2
+          }
+        ]
+      },
+      "clarification": null,
+      "error": null
+    },
+    {
+      "id": "amb_unknown_word",
+      "answer": "seasoned means over 60 years old",
+      "expected_ir_after_answer": {
+        "operation": "move",
+        "source": "people",
+        "destination": "pension",
+        "condition": {
+          "field": "age",
+          "operator": ">",
+          "value": 60
+        }
+      },
+      "status": "executed",
+      "instruction": "Move all the seasoned people to pension.",
+      "rounds": 2,
+      "ir": {
+        "operation": "move",
+        "source": "people",
+        "destination": "pension",
+        "condition": {
+          "field": "age",
+          "operator": ">",
+          "value": 60
+        }
+      },
+      "plan": {
+        "steps": [
+          {
+            "action": "find",
+            "collection": "people",
+            "filter": {
+              "age": {
+                "$gt": 60
+              }
+            },
+            "documents": null,
+            "updates": null,
+            "store": "matched"
+          },
+          {
+            "action": "delete_many",
+            "collection": "people",
+            "filter": {
+              "age": {
+                "$gt": 60
+              }
+            },
+            "documents": null,
+            "updates": null,
+            "store": null
+          },
+          {
+            "action": "insert_many",
+            "collection": "pension",
+            "filter": null,
+            "documents": {
+              "$ref": "matched"
+            },
+            "updates": null,
+            "store": null
+          }
+        ],
+        "return_store": null
+      },
+      "execution": {
+        "result": null,
+        "log": [
+          {
+            "action": "find",
+            "collection": "people",
+            "matched": 2
+          },
+          {
+            "action": "delete_many",
+            "collection": "people",
+            "removed": 2
+          },
+          {
+            "action": "insert_many",
+            "collection": "pension",
+            "inserted": 2
+          }
+        ]
+      },
+      "clarification": null,
+      "error": null
+    },
+    {
+      "id": "amb_no_threshold",
+      "answer": "salary above 100000",
+      "expected_ir_after_answer": {
+        "operation": "update",
+        "source": "people",
+        "condition": {
+          "field": "salary",
+          "operator": ">",
+          "value": 100000
+        },
+        "set": {
+          "status": "retired"
+        }
+      },
+      "status": "executed",
+      "instruction": "Retire everyone with a high salary.",
+      "rounds": 2,
+      "ir": {
+        "operation": "update",
+        "source": "people",
+        "condition": {
+          "field": "salary",
+          "operator": ">",
+          "value": 100000
+        },
+        "set": {
+          "status": "retired"
+        }
+      },
+      "plan": {
+        "steps": [
+          {
+            "action": "update_many",
+            "collection": "people",
+            "filter": {
+              "salary": {
+                "$gt": 100000
+              }
+            },
+            "documents": null,
+            "updates": {
+              "$set": {
+                "status": "retired"
+              }
+            },
+            "store": null
+          }
+        ],
+        "return_store": null
+      },
+      "execution": {
+        "result": null,
+        "log": [
+          {
+            "action": "update_many",
+            "collection": "people",
+            "modified": 0
+          }
+        ]
+      },
+      "clarification": null,
+      "error": null
+    }
+  ]
+}

@@ -67,7 +67,9 @@ flowchart LR
 Setup: fresh seeded store per case; temperature 0; canonical IR comparison
 (60 ≡ 60.0); baseline runs in a sandbox exposing only `db_*` functions;
 correctness judged by final store state vs. the reference state produced by
-running the expected IR through our own pipeline.
+running the expected IR through our own pipeline. The translator's few-shot
+examples are drawn from sentences disjoint from all benchmark cases, and the
+LLM never sees the expected IRs (audited via `experiments/audit.py`).
 
 ### 6.1 Paraphrase convergence (H1)
 
@@ -99,9 +101,9 @@ Same 29 cases through direct LLM → Python code (sandboxed).
 
 | Metric | This system | Direct code |
 |---|---|---|
-| Paraphrase correctness (20) | **20/20** | 15/20 (3 runtime crashes) |
-| Ambiguity: asked instead of guessed (4) | **4/4** | 2/4 |
-| Adversarial: safe (5) | **5/5, every run** | varies (2 unsafe in one run) |
+| Paraphrase correctness (20) | **20/20** | 14/20 (3 crashes; 14–16 across runs) |
+| Ambiguity: asked instead of guessed (4) | **4/4** | 3/4 |
+| Adversarial: safe (5) | **5/5, every run** | varies (1–2 unsafe across runs) |
 
 Direct-code failure modes: runtime crashes (`KeyError: '_id'`), state
 corruption (find-then-insert without delete), and silent data corruption —

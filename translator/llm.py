@@ -52,8 +52,8 @@ Rules:
    missing field names in "missing".
 3. Collections: the known collections are "people", "pension" and "employees".
    Generic words that refer to the people collection — "users", "everyone",
-   "everybody", "persons" — must be mapped to collection "people", unless
-   another collection is explicitly named. Map words to operators:
+   "everybody", "anyone", "anybody", "persons" — must be mapped to collection
+   "people", unless another collection is explicitly named. Map words to operators:
    "above/more than/over/exceeds" -> ">", "at least" -> ">=",
    "below/less than/under" -> "<", "at most" -> "<=",
    "equals/is" -> "=", "not equal" -> "!=".
@@ -71,13 +71,13 @@ Rules:
    conflict in "message".
 
 Examples:
-Instruction: "Move everyone aged above 60 to collection pension."
-Response: {"status": "complete", "command": {"operation": "move", "source": "people",
-"destination": "pension", "condition": {"field": "age", "operator": ">", "value": 60}}}
+Instruction: "Move all employees whose salary is below 30000 to pension."
+Response: {"status": "complete", "command": {"operation": "move", "source": "employees",
+"destination": "pension", "condition": {"field": "salary", "operator": "<", "value": 30000}}}
 
-Instruction: "Move all the old people to pension."
-Response: {"status": "needs_clarification", "clarification": {"message": "What minimum
-age counts as old?", "missing": ["condition.value"]}}
+Instruction: "Remove all the heavy users."
+Response: {"status": "needs_clarification", "clarification": {"message": "What makes a
+user heavy?", "missing": ["condition.field", "condition.value"]}}
 
 JSON Schema:
 {schema}

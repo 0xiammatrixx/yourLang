@@ -96,11 +96,11 @@ the browser.
 
 | Metric | This system | Direct LLM → code |
 |---|---|---|
-| Paraphrase correctness (20) | **20/20** | 15/20 (3 crashes) |
+| Paraphrase correctness (20) | **20/20** | 14/20 (14–16 across runs) |
 | Paraphrase convergence (4 intents) | **4/4** → identical IRs | n/a (state-level) |
-| Ambiguity: asked instead of guessed (4) | **4/4** | 2/4 |
+| Ambiguity: asked instead of guessed (4) | **4/4** | 3/4 (1 guessed) |
 | Clarification loop completion (4) | **4/4** correct IR | — |
-| Adversarial: safe (5) | **5/5** (0 unsafe in all runs) | varies: 2 unsafe in one run |
+| Adversarial: safe (5) | **5/5** (0 unsafe in all runs) | varies: 1–2 unsafe across runs |
 | LLM #2 review: detection of wrong-but-valid IRs (8) | — | 8/8 (false-rejection 1/20) |
 
 Notable findings (see `docs/paper.md` for the full evaluation):
