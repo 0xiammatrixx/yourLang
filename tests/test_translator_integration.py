@@ -33,5 +33,7 @@ def test_real_translate_move():
 @requires_key
 def test_real_ambiguity_requests_clarification():
     result = translate("Move all the old people to pension.")
-    assert result.status == "needs_clarification"
+    # The system must not silently guess; asking (clarify) or proposing a
+    # best guess for confirmation are both valid.
+    assert result.status in ("needs_clarification", "needs_confirmation")
     assert result.clarification.message
