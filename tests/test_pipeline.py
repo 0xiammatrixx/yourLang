@@ -99,10 +99,10 @@ def test_clarification_without_clarify_fn_stops():
 
 def test_semantic_error_reported_as_invalid():
     store = seed_demo_store()
-    fake = FakeTranslator([complete({**MOVE, "source": "banana"})])
-    outcome = process_instruction("Move people from banana to pension.", fake, store)
+    fake = FakeTranslator([complete({**MOVE, "destination": "people"})])
+    outcome = process_instruction("Move people to people.", fake, store)
     assert outcome["status"] == "invalid"
-    assert "banana" in outcome["error"]
+    assert "same collection" in outcome["error"]
 
 
 def test_translation_error_reported():
@@ -177,3 +177,61 @@ def test_multiple_operations_execute():
     assert sorted(d["name"] for d in store.find("employees", None)) == ["Alice", "Ben"]
     assert [d["name"] for d in store.find("people", None)] == ["David"]
     assert len(store.find("pension", None)) == 0
+
+
+def test_missing_collection_offers_to_create():
+    store = seed_demo_store()
+    fake = FakeTranslator(
+        [
+            complete(
+                {
+                    "operation": "add",
+                    "destination": "intern",
+                    "records": [{"name": "David", "age": 30}],
+                }
+            )
+        ]
+    )
+    outcome = process_instruction(
+        "Add David to the intern collection.", fake, store, confirm_fn=lambda q: True
+    )
+    assert outcome["status"] == "executed"
+    assert "intern" in store.list_collections()
+    assert len(store.find("intern", None)) == 1
+
+
+def test_missing_collection_without_confirm_asks():
+    store = seed_demo_store()
+    fake = FakeTranslator(
+        [
+            complete(
+                {"operation": "add", "destination": "intern", "records": [{"name": "David"}]}
+            )
+        ]
+    )
+    outcome = process_instruction("Add David to the intern collection.", fake, store)
+    assert outcome["status"] == "needs_confirmation"
+    assert "does not exist" in outcome["clarification"]["message"]
+    assert "intern" not in store.list_collections()
+
+
+def test_typo_suggests_existing_collection():
+    store = seed_demo_store()
+    store.create_collection("intern")
+    fake = FakeTranslator(
+        [
+            complete(
+                {
+                    "operation": "add",
+                    "destination": "intenr",
+                    "records": [{"name": "David"}],
+                }
+            )
+        ]
+    )
+    outcome = process_instruction(
+        "Add David to the intenr collection.", fake, store, confirm_fn=lambda q: True
+    )
+    assert outcome["status"] == "executed"
+    assert len(store.find("intern", None)) == 1
+    assert "intenr" not in store.list_collections()

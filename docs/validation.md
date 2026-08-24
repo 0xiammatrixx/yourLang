@@ -23,17 +23,18 @@ Catches *meaning* errors that are still structurally valid:
 
 | Failure class | Example | Result |
 |---|---|---|
-| Unknown source collection | `source: "users"` (alias not mapped) | rejected |
-| Unknown destination collection | `destination: "moon"` | rejected |
 | Immutable record id | `update … set: {"_id": 99}` | rejected |
 | Non-numeric record id | `condition: _id = "1"` | rejected |
 | Same source and destination | `people → people` | rejected |
 | Invalid collection name | `create "2 fast"` | rejected |
-| Duplicate collection | `create "people"` (exists) | rejected |
 
 Fields are **schemaless** (matching MongoDB's document model): any field name
-or value type is accepted, so there is no "unknown field" rejection. This was a
-deliberate relaxation from an earlier fixed-schema prototype.
+or value type is accepted, so there is no "unknown field" rejection.
+
+Collection EXISTENCE is a runtime concern, not a validator concern: the
+pipeline checks the store's current collections and, when a referenced
+collection is missing, offers to create it or suggests the closest existing
+name (typo correction) before executing anything.
 
 ## Layer 2 — semantic reviewer (LLM #2, `experiments/review.py`)
 

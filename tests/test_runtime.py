@@ -4,7 +4,7 @@ import pytest
 
 from compiler.mongodb import CompiledPlan, Step, compile_operation
 from ir.models import TranslationResult
-from runtime.database import MemoryStore, StoreError, execute_plan
+from runtime.database import MemoryStore, StoreError, execute_plan, nearest_collection
 
 
 def command(raw: dict):
@@ -216,3 +216,10 @@ def test_delete_any_removes_one_arbitrary_record():
     removed = store.delete_many("employees", None, limit=1)
     assert removed == 1
     assert len(store.find("employees", None)) == 2
+
+
+def test_nearest_collection():
+    existing = ["people", "employees", "pension", "intern"]
+    assert nearest_collection("intenr", existing) == "intern"
+    assert nearest_collection("ppl", existing) == "people"
+    assert nearest_collection("zzz", existing) is None

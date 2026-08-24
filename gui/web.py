@@ -10,8 +10,8 @@ from typing import Any
 
 from compiler.mongodb import compile_command
 from ir.models import TranslationResult, command_to_json
-from main import _follow_up, seed_demo_store
-from runtime.database import MemoryStore, execute_plan
+from main import _follow_up, _missing_collections, _substitute_collection, seed_demo_store
+from runtime.database import MemoryStore, execute_plan, nearest_collection
 from translator import TranslationError
 from validator.semantic import SemanticError, validate_command
 
@@ -120,4 +120,31 @@ def run_web(
             },
         }
 
-    return _execute(instruction, result.command, store)
+    command = result.command
+    missing = _missing_collections(command, store)
+    if missing:
+        name = missing[0]
+        suggestion = nearest_collection(name, store.list_collections())
+        if suggestion:
+            question = f'Collection "{name}" does not exist. Did you mean "{suggestion}"?'
+            resolved = _substitute_collection(command, name, suggestion)
+        else:
+            question = f'Collection "{name}" does not exist. Create it?'
+            create = TranslationResult.model_validate(
+                {"status": "complete", "command": {"operation": "create", "destination": name}}
+            ).command
+            resolved = ([create] + command) if isinstance(command, list) else [create, command]
+        state["pending"] = {
+            "kind": "confirm",
+            "instruction": instruction,
+            "question": question,
+            "command": command_to_json(resolved),
+        }
+        return {
+            "status": "needs_confirmation",
+            "instruction": instruction,
+            "ir": command_to_json(command),
+            "clarification": {"message": question, "missing": []},
+        }
+
+    return _execute(instruction, command, store)

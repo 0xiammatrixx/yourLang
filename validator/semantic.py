@@ -3,13 +3,13 @@
 Structural validation (shape) is handled by the Pydantic models. This module
 checks that a well-shaped command is also meaningful in this domain:
 
-- collections must be known,
 - the record id (`_id`) is immutable and must be a whole number,
 - move/copy must not use the same collection for source and destination,
-- create must use a syntactically valid, not-yet-existing collection name.
+- create must use a syntactically valid collection name.
 
-Fields are SCHEMALESS (like MongoDB): any record may carry any fields, so the
-validator does not restrict field names or value types.
+Collection EXISTENCE is a runtime concern, not checked here — the pipeline
+resolves missing collections with typo suggestions and create offers. Fields
+are SCHEMALESS (like MongoDB): any record may carry any fields.
 """
 
 import re
@@ -63,14 +63,6 @@ def known_collections() -> tuple[str, ...]:
     return tuple(COLLECTION_SCHEMA)
 
 
-def _check_known(name: str, role: str) -> None:
-    if name not in COLLECTION_SCHEMA:
-        raise SemanticError(
-            f"Unknown {role} collection '{name}'. "
-            f"Known collections: {', '.join(sorted(COLLECTION_SCHEMA))}."
-        )
-
-
 def _check_condition(collection: str, condition: Any) -> None:
     if condition is None:
         return  # no condition = match all records
@@ -104,29 +96,24 @@ def _check_collection_name(name: str) -> None:
 
 
 def validate(command: Operation) -> Operation:
-    """Raise SemanticError if the command is not meaningful; return it otherwise."""
+    """Raise SemanticError if the command is not meaningful; return it otherwise.
+
+    Collection existence is NOT checked here — that is a runtime concern (the
+    pipeline resolves missing collections with typo/create offers).
+    """
     if isinstance(command, CreateOperation):
         _check_collection_name(command.destination)
-        if command.destination in COLLECTION_SCHEMA:
-            raise SemanticError(
-                f"Collection '{command.destination}' already exists."
-            )
     elif isinstance(command, AddOperation):
-        _check_known(command.destination, "destination")
         _check_records(command.destination, command.records)
     elif isinstance(command, (MoveOperation, CopyOperation)):
-        _check_known(command.source, "source")
-        _check_known(command.destination, "destination")
         if command.source == command.destination:
             raise SemanticError(
                 f"Source and destination are the same collection: '{command.source}'."
             )
         _check_condition(command.source, command.condition)
     elif isinstance(command, (RemoveOperation, FindOperation)):
-        _check_known(command.source, "source")
         _check_condition(command.source, command.condition)
     elif isinstance(command, UpdateOperation):
-        _check_known(command.source, "source")
         _check_condition(command.source, command.condition)
         _check_updates(command.source, command.set)
     else:  # pragma: no cover — the discriminated union is exhaustive

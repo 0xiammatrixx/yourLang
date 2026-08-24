@@ -80,20 +80,19 @@ def test_cannot_set_record_id():
 
 def test_validate_command_sequence():
     ok = command({"operation": "move", "source": "people", "destination": "employees"})
-    bad = command({"operation": "move", "source": "banana", "destination": "employees"})
+    bad = command({"operation": "move", "source": "people", "destination": "people"})
     validate_command([ok, ok])
     with pytest.raises(SemanticError):
         validate_command([ok, bad])
 
 
-def test_unknown_source_rejected():
-    with pytest.raises(SemanticError):
-        validate(command({**MOVE, "source": "banana"}))
+def test_unknown_source_allowed_at_validator_level():
+    # Collection existence is a runtime concern, not a validator concern.
+    validate(command({**MOVE, "source": "banana"}))
 
 
-def test_unknown_destination_rejected():
-    with pytest.raises(SemanticError):
-        validate(command({**MOVE, "destination": "banana"}))
+def test_unknown_destination_allowed_at_validator_level():
+    validate(command({**MOVE, "destination": "banana"}))
 
 
 def test_arbitrary_condition_field_is_allowed():
@@ -129,9 +128,9 @@ def test_create_new_collection_allowed():
     validate(command({"operation": "create", "destination": "archive"}))
 
 
-def test_create_existing_collection_rejected():
-    with pytest.raises(SemanticError):
-        validate(command({"operation": "create", "destination": "people"}))
+def test_create_any_name_allowed_at_validator_level():
+    # Existence/duplication is checked at runtime, not by the validator.
+    validate(command({"operation": "create", "destination": "people"}))
 
 
 def test_create_bad_name_rejected():

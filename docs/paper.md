@@ -73,9 +73,10 @@ flowchart LR
   model infers meaning from context (in any natural language) and requests
   confirmation when a word has multiple plausible readings.
 - **Validator:** structural (Pydantic, `extra=forbid`, discriminated union) +
-  semantic (`validator/semantic.py`: known collections, immutable record id,
-  source ≠ destination, name syntax). Fields are schemaless, matching
-  MongoDB's document model.
+  semantic (`validator/semantic.py`: immutable record id, source ≠ destination,
+  name syntax). Fields are schemaless, matching MongoDB's document model.
+  Collection existence is a runtime concern: the pipeline offers to create a
+  missing collection or corrects a likely misspelling.
 - **Compiler:** IR → ordered plan of primitive MongoDB steps; `move` = find +
   delete_many + insert_many with a `{"$ref"}` data dependency.
 - **Runtime:** `MemoryStore` (deterministic, used by all experiments) and
@@ -175,6 +176,11 @@ failure modes:
    row" is `remove` with `condition: null, limit: 1`; and clarification
    questions now name the available collections and fields instead of assuming
    the user knows them.
+
+5. **Unknown-collection recovery.** Operating on a collection that does not
+   exist used to produce a raw "unknown collection" error. Now the pipeline
+   checks the store's actual collections, offers to create a missing one, and
+   detects likely misspellings ("did you mean 'intern'?").
 
 ## 7. Discussion
 

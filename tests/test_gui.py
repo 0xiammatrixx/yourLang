@@ -81,10 +81,10 @@ def test_clarification_flow_then_answer():
 def test_semantic_error_reported_as_invalid():
     store = new_store()
     state = {"pending": None}
-    fake = FakeTranslator([complete({**MOVE, "source": "banana"})])
-    outcome = run_web(fake, store, state, "Move people from banana to pension.")
+    fake = FakeTranslator([complete({**MOVE, "destination": "people"})])
+    outcome = run_web(fake, store, state, "Move people to people.")
     assert outcome["status"] == "invalid"
-    assert "banana" in outcome["error"]
+    assert "same collection" in outcome["error"]
 
 
 def test_confirmation_yes_executes():

@@ -62,6 +62,10 @@ Rules:
    schemaless): any field name may be used; typical fields are name, age,
    country, salary, status, plus the unique numeric record id (use field
    "_id").
+   If the user names a collection you do not recognize — even one that looks
+   misspelled — use the EXACT name they typed; do not ask which collection they
+   meant. The system itself checks whether the collection exists, corrects an
+   obvious misspelling, or offers to create it.
 4. Scope: if the instruction explicitly says all/everyone/everybody/everything
    with no other criterion, set "condition" to null to match ALL records. If no
    quantifier and no condition is given (e.g. "move people to pension"), the

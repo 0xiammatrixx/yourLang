@@ -9,6 +9,7 @@ The runtime is deterministic code — the LLM never appears here.
 
 from __future__ import annotations
 
+import difflib
 import json
 from typing import Any, Protocol
 
@@ -17,6 +18,12 @@ from compiler.mongodb import CompiledPlan
 
 class StoreError(RuntimeError):
     """A step could not be executed against the store."""
+
+
+def nearest_collection(name: str, existing: list[str], cutoff: float = 0.6) -> str | None:
+    """Return the closest existing collection name, or None if none is close."""
+    matches = difflib.get_close_matches(name, existing, n=1, cutoff=cutoff)
+    return matches[0] if matches else None
 
 
 class Store(Protocol):

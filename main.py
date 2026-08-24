@@ -13,7 +13,7 @@ from typing import Any, Callable
 
 from compiler.mongodb import compile_command
 from ir.models import TranslationResult, command_to_json
-from runtime.database import MemoryStore, Store, StoreError, execute_plan
+from runtime.database import MemoryStore, Store, StoreError, execute_plan, nearest_collection
 from translator import TranslationError, Translator
 from validator.semantic import SemanticError, validate_command
 
@@ -100,6 +100,46 @@ def _execute_command(
         plan=plan.to_dict(),
         execution=execution,
     )
+
+
+def _referenced_collections(command: Any) -> list[str]:
+    """All source/destination collection names a command REFERENCES.
+
+    `create`'s destination is the new collection, not a reference, so it is
+    skipped.
+    """
+    cmds = command if isinstance(command, list) else [command]
+    names: list[str] = []
+    for c in cmds:
+        if getattr(c, "operation", None) == "create":
+            continue
+        for attr in ("source", "destination"):
+            value = getattr(c, attr, None)
+            if value:
+                names.append(value)
+    return names
+
+
+def _missing_collections(command: Any, store: Store) -> list[str]:
+    existing = set(store.list_collections())
+    missing: list[str] = []
+    for name in _referenced_collections(command):
+        if name not in existing and name not in missing:
+            missing.append(name)
+    return missing
+
+
+def _substitute_collection(command: Any, old: str, new: str) -> Any:
+    """Return a copy of the command with collection `old` replaced by `new`."""
+    if isinstance(command, list):
+        return [_substitute_collection(c, old, new) for c in command]
+    data = command.model_dump()
+    for attr in ("source", "destination"):
+        if data.get(attr) == old:
+            data[attr] = new
+    return TranslationResult.model_validate(
+        {"status": "complete", "command": data}
+    ).command
 
 
 def process_instruction(
@@ -195,7 +235,41 @@ def process_instruction(
                 error="Not confirmed by the user.",
             )
 
-        return _execute_command(instruction, result.command, store, rounds)
+        command = result.command
+        missing = _missing_collections(command, store)
+        if missing:
+            name = missing[0]
+            suggestion = nearest_collection(name, store.list_collections())
+            if suggestion:
+                question = f'Collection "{name}" does not exist. Did you mean "{suggestion}"?'
+            else:
+                question = f'Collection "{name}" does not exist. Create it?'
+            details = {"message": question, "missing": []}
+            if confirm_fn is None:
+                return _outcome(
+                    "needs_confirmation",
+                    instruction,
+                    rounds=rounds,
+                    ir=command_to_json(command),
+                    clarification=details,
+                )
+            answer = confirm_fn(question)
+            if answer is True:
+                if suggestion:
+                    command = _substitute_collection(command, name, suggestion)
+                else:
+                    store.create_collection(name)
+                return _execute_command(instruction, command, store, rounds)
+            return _outcome(
+                "needs_clarification",
+                instruction,
+                rounds=rounds,
+                ir=command_to_json(command),
+                clarification=details,
+                error="Not confirmed by the user.",
+            )
+
+        return _execute_command(instruction, command, store, rounds)
 
     return _outcome(
         "needs_clarification",

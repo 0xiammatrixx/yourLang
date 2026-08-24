@@ -171,7 +171,7 @@ def test_create_compiles_to_create_collection():
 
 def test_unvalidated_command_is_rejected():
     with pytest.raises(SemanticError):
-        compile_operation(command({**MOVE, "source": "banana"}))
+        compile_operation(command({**MOVE, "destination": "people"}))
 
 
 def test_plan_serializes_to_json():
