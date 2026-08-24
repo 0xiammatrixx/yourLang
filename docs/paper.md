@@ -12,7 +12,11 @@
 - Contributions:
   1. an architecture with a strict deterministic boundary after the LLM,
   2. a tiny domain (database instructions) with a formally specified IR,
-  3. an experimental evaluation of convergence, ambiguity, safety, and review
+  3. a confirmation protocol for ambiguity: word meanings are inferred, never
+     enumerated — any word with multiple plausible readings triggers a
+     "did you mean X or Y?" check before execution,
+  4. a multilingual front-end that maps any natural language to the same IR,
+  5. an experimental evaluation of convergence, ambiguity, safety, and review
      against a direct-code-generation baseline.
 
 ## 2. Background
@@ -31,7 +35,9 @@ system does differently.
 flowchart LR
     U[Natural language] --> T["LLM translator (DeepSeek)"]
     T --> IR["Semantic IR (JSON, Pydantic)"]
-    IR --> V["Validator: structural + semantic"]
+    IR --> P["Ambiguous word?<br/>confirm: did you mean X or Y?"]
+    P -->|confirmed| V["Validator: structural + semantic"]
+    P -->|not confirmed| T
     V -->|fail| Q[Clarification loop]
     Q --> T
     V -->|pass| C[Compiler → MongoDB plan]
@@ -53,10 +59,15 @@ flowchart LR
   Pydantic v2, pymongo (optional), pytest. No LangChain/agents/RAG.
 - **IR:** 7 operations (`create`, `add`, `remove`, `move`, `copy`, `find`,
   `update`), 6 operators (`=`, `!=`, `>`, `<`, `>=`, `<=`), one wrapper
-  `TranslationResult` with states `complete` | `needs_clarification`.
+  `TranslationResult` with states `complete` | `needs_clarification` |
+  `needs_confirmation`. `condition` is optional; `null` means **match all
+  records** — how "everybody"/"all" is represented — and compiles to an empty
+  MongoDB filter `{}`.
 - **Translator:** JSON output mode, JSON Schema embedded in the system prompt,
   one-shot corrective retry, tolerant parsing of a stray trailing token,
-  temperature 0.
+  temperature 0. The prompt carries **no dictionary of word meanings**: the
+  model infers meaning from context (in any natural language) and requests
+  confirmation when a word has multiple plausible readings.
 - **Validator:** structural (Pydantic, `extra=forbid`, discriminated union) +
   semantic (`validator/semantic.py`: known collections, known fields, value
   types, source ≠ destination, name syntax).
@@ -64,7 +75,7 @@ flowchart LR
   delete_many + insert_many with a `{"$ref"}` data dependency.
 - **Runtime:** `MemoryStore` (deterministic, used by all experiments) and
   `MongoStore` (pymongo) behind one interface.
-- 61 unit tests + 2 live integration tests.
+- 73 unit tests + 2 live integration tests (75 total).
 
 ## 6. Evaluation
 
@@ -129,6 +140,30 @@ invented threshold).
 contradicted its own verdict ("so it should be approved… So I'll approve") yet
 returned REJECTED.**
 
+### 6.6 Failure analysis and design iterations
+
+Three issues found by probing the system; each drove a structural (not merely
+prompt-level) fix — evidence that the IR's formal constraints surface real
+failure modes:
+
+1. **"All records" was unrepresentable.** For *"Add everybody to employees
+   without deleting them from the previous collection"*, the LLM correctly
+   chose `copy` but invented a nonsense filter `status != "deleted"` because
+   `condition` was a required field and "everybody" (match-all) had no
+   encoding. Fix: `condition` is now optional; `null` = match-all. Result:
+   `copy people → employees, condition: null`, 3 matched → 3 inserted, source
+   untouched.
+
+2. **Per-word meaning rules do not scale.** A first attempt mapped the verb
+   "retire" to `status = "retired"` in the prompt. Instead of fixing one word,
+   the prompt was replaced by a general principle — *if any word has multiple
+   plausible readings, confirm* — and "retire" now yields *"Did you mean: set
+   their status to retired? Or move them to pension?"*.
+
+3. **Multilingual input requires no extra machinery.** A French sentence maps
+   to the same IR as its English equivalent, because the model translates
+   meaning, not tokens.
+
 ## 7. Discussion
 
 - Where it works: single-clause, single-condition instructions; convergence is
@@ -139,6 +174,13 @@ returned REJECTED.**
 - Security/reliability: safety comes from the deterministic layer, not from
   the model; direct code generation is probabilistically safe, this system is
   safe by construction (0 unsafe across all runs).
+- Architecture insight: the system deliberately keeps **no dictionary of word
+  meanings** — interpretation is delegated to the LLM and ambiguity is resolved
+  by a confirmation protocol; only finite, structural (operation-level) mappings
+  live in the prompt.
+- The IR's formal constraints surface failure modes: requiring `condition` made
+  the LLM hallucinate a filter; making it optional removed the failure at the
+  source instead of patching the model.
 - LLM reviewer adds safety but is itself probabilistic (1 false rejection with
   self-contradicting reasoning).
 - Threats to validity: temperature 0, one model (deepseek-chat), small
@@ -150,8 +192,10 @@ returned REJECTED.**
 - Demonstrated: an LLM front-end + canonical IR + deterministic
   validation/compilation achieves paraphrase convergence (20/20), asks instead
   of guessing (4/4), is safe on adversarial input (5/5), and outperforms
-  direct code generation on correctness (20/20 vs 15/20) while eliminating
-  silent corruption.
+  direct code generation on correctness (20/20 vs 14–16/20) while eliminating
+  silent corruption. It maps any natural language to the same IR, and it keeps
+  no dictionary of word meanings — ambiguity is resolved by a confirmation
+  protocol rather than enumerated rules.
 - Future work: compound conditions and exceptions in the IR, multi-domain
   front-ends, integrating the reviewer into the pipeline with cost analysis,
   larger benchmark sets, other models.

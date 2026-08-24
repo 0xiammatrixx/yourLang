@@ -26,6 +26,10 @@ This is deliberately narrower than "I invented natural-language programming"
   experiments 2.3 and 2.4.*
 - **H4 (review):** a second LLM reviewing (instruction, IR) pairs catches
   semantically-valid-but-wrong IRs. *Tested by experiment 2.5.*
+- **H5 (confirmation):** when a word or phrase has multiple plausible readings,
+  the system proposes its best guess and asks the user to confirm instead of
+  silently choosing one meaning. *Tested by the `needs_confirmation` state and
+  the failure analysis in §6.6.*
 
 ## Architecture decisions
 
