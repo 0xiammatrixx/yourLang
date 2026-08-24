@@ -42,6 +42,15 @@ def test_condition_to_filter_none_means_all():
     assert condition_to_filter(None) == {}
 
 
+def test_condition_to_filter_normalizes_id():
+    assert condition_to_filter(Condition(field="id", operator="=", value=1)) == {
+        "_id": {"$eq": 1}
+    }
+    assert condition_to_filter(Condition(field="_id", operator="=", value=1)) == {
+        "_id": {"$eq": 1}
+    }
+
+
 def test_copy_all_compiles_with_empty_filter():
     plan = compile_operation(
         command(

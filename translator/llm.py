@@ -59,7 +59,8 @@ Rules:
    When your question requires the user to choose a collection or field, NAME
    the available options so they can pick without prior knowledge: collections
    are "people", "employees", "pension"; fields of "people" are name, age,
-   country, salary, status.
+   country, salary, status, plus the unique numeric record id (use field
+   "_id").
 4. Scope: if the instruction explicitly says all/everyone/everybody/everything
    with no other criterion, set "condition" to null to match ALL records. If no
    quantifier and no condition is given (e.g. "move people to pension"), the

@@ -91,6 +91,12 @@ def _check_field_value(collection: str, field: str, value: Any) -> None:
 def _check_condition(collection: str, condition: Any) -> None:
     if condition is None:
         return  # no condition = match all records
+    if condition.field in ("id", "_id"):
+        if not (isinstance(condition.value, int) and not isinstance(condition.value, bool)):
+            raise SemanticError(
+                f"Record id must be a whole number, got {condition.value!r}."
+            )
+        return
     _check_field_value(collection, condition.field, condition.value)
 
 

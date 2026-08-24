@@ -72,10 +72,12 @@ def condition_to_filter(condition: Condition | None) -> dict[str, Any]:
     """Translate one IR condition into a MongoDB filter expression.
 
     None (no condition) means "match ALL records" and becomes an empty filter.
+    "id"/"_id" are normalized to the internal `_id` field.
     """
     if condition is None:
         return {}
-    return {condition.field: {MONGO_OPERATOR[condition.operator]: condition.value}}
+    field = "_id" if condition.field in ("id", "_id") else condition.field
+    return {field: {MONGO_OPERATOR[condition.operator]: condition.value}}
 
 
 def compile_operation(command: Operation) -> CompiledPlan:

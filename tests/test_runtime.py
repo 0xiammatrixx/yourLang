@@ -141,6 +141,23 @@ def test_copy_all_copies_everyone_and_keeps_source():
     assert sorted(d["name"] for d in store.find("employees", None)) == ["Alice", "Ben", "David"]
 
 
+def test_move_by_id_moves_the_right_record():
+    store = seeded_store()
+    plan = compile_operation(
+        command(
+            {
+                "operation": "move",
+                "source": "people",
+                "destination": "pension",
+                "condition": {"field": "_id", "operator": "=", "value": 1},
+            }
+        )
+    )
+    execute_plan(plan, store)
+    assert sorted(d["name"] for d in store.find("people", None)) == ["Alice", "Ben"]
+    assert [d["name"] for d in store.find("pension", None)] == ["David"]
+
+
 def test_create_then_collection_exists():
     store = seeded_store()
     plan = compile_operation(command({"operation": "create", "destination": "archive"}))

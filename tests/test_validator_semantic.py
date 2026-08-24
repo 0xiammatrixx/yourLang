@@ -37,6 +37,47 @@ def test_move_without_condition_is_allowed():
     )
 
 
+def test_move_by_record_id_is_allowed():
+    validate(
+        command(
+            {
+                "operation": "move",
+                "source": "people",
+                "destination": "pension",
+                "condition": {"field": "_id", "operator": "=", "value": 1},
+            }
+        )
+    )
+
+
+def test_record_id_must_be_numeric():
+    with pytest.raises(SemanticError):
+        validate(
+            command(
+                {
+                    "operation": "move",
+                    "source": "people",
+                    "destination": "pension",
+                    "condition": {"field": "_id", "operator": "=", "value": "1"},
+                }
+            )
+        )
+
+
+def test_cannot_set_record_id():
+    with pytest.raises(SemanticError):
+        validate(
+            command(
+                {
+                    "operation": "update",
+                    "source": "people",
+                    "condition": {"field": "age", "operator": ">", "value": 60},
+                    "set": {"_id": 99},
+                }
+            )
+        )
+
+
 def test_unknown_source_rejected():
     with pytest.raises(SemanticError):
         validate(command({**MOVE, "source": "banana"}))
