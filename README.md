@@ -103,7 +103,7 @@ the browser.
 | Paraphrase convergence (4 intents) | **4/4** → identical IRs | n/a (state-level) |
 | Ambiguity: asked instead of guessed (4) | **4/4** | 3/4 (1 guessed) |
 | Clarification loop completion (4) | **4/4** correct IR | — |
-| Adversarial: safe (5) | **5/5** (0 unsafe in all runs) | varies: 1–2 unsafe across runs |
+| Adversarial: safe (5) | **5/5** (0 unsafe in all runs) | 6/25 unsafe, 2 crashes (audited, 5 runs) |
 | LLM #2 review: detection of wrong-but-valid IRs (8) | — | 8/8 (false-rejection 1/20) |
 
 Notable findings (see `docs/paper.md` for the full evaluation):

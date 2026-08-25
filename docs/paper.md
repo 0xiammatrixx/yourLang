@@ -18,8 +18,8 @@ _[Write 150–250 words covering:]_
   baseline, on a database-instruction domain;_
 - _the results: 20/20 paraphrase convergence, 4/4 ambiguity detection and
   clarification, 5/5 adversarial safety, 20/20 vs 14–16/20 baseline correctness
-  with zero unsafe executions (vs 1–2 for the baseline), and an 8/8 detection
-  rate for the second-LLM reviewer;_
+  with zero unsafe executions (vs 6 audited unsafe executions for the baseline
+  across 5 runs), and an 8/8 detection rate for the second-LLM reviewer;_
 - _the key finding: safety comes from the deterministic boundary, not from the
   model._
 
@@ -52,8 +52,9 @@ _[Write narrative prose. Required elements:]_
      (`docs/ir-spec.md`);
   3. an ambiguity protocol with two modes — open clarification when no guess
      exists, and propose-then-confirm ("did you mean X or Y?") when a word has
-     multiple plausible readings — with **no dictionary of word meanings**
-     maintained anywhere;
+     multiple plausible readings — without any closed dictionary or rule module
+     resolving word meanings (the prompt carries only finite structural
+     mappings and a few illustrative examples);
   4. a multilingual front end that maps any natural language (English, French,
      …) onto the same IR;
   5. an empirical **failure taxonomy** of natural-language-programming failure
@@ -141,7 +142,11 @@ flowchart LR
   the full formal specification.
 - **Translator:** JSON output mode, JSON Schema embedded in the system prompt,
   one-shot corrective retry, tolerant parsing of a stray trailing token,
-  temperature 0. The prompt carries **no dictionary of word meanings**.
+  temperature 0. The prompt resolves word meanings by **inference, not
+  lookup**: it contains no closed vocabulary dictionary — only finite
+  structural mappings (operation semantics, operator words, generic-word
+  examples) and a small set of illustrative examples of the
+  complete/clarify/confirm protocol.
 - **Validator:** structural (Pydantic, `extra=forbid`, discriminated union) +
   semantic (`validator/semantic.py`: immutable record id, source ≠ destination,
   name syntax). Fields are schemaless, matching MongoDB's document model.
@@ -267,13 +272,18 @@ Same 29 cases through direct LLM → Python code (sandboxed).
 |---|---|---|
 | Paraphrase correctness (20) | **20/20** | 14/20 (3 crashes; 14–16 across runs) |
 | Ambiguity: asked instead of guessed (4) | **4/4** | 3/4 |
-| Adversarial: safe (5) | **5/5, every run** | varies (1–2 unsafe across runs) |
+| Adversarial: safe (5) | **5/5, every run** | 6/25 unsafe, 2 crashes, 17 asked (audited, 5 runs) |
 
-Direct-code failure modes: runtime crashes (`KeyError: '_id'`), state
-corruption (find-then-insert without delete), and silent data corruption —
-*"move everyone over 60 to the moon"* became `db_update({"$set": {"country":
-"moon"}})` in one run. The pipeline had **0 unsafe executions across all
-runs**: its safety is by construction, the baseline's is probabilistic.
+Direct-code failure modes, classified by an audited metric
+(`experiments/audit.py`, `baseline_safety_metric`): across the 5 recorded runs
+of the baseline on the 5 adversarial cases (25 total), the baseline **executed
+unsafe operations 6 times** (per-run: 2, 0, 2, 1, 1), **crashed twice**, and
+asked 17 times. Unsafe executions include silent data corruption — *"move
+everyone over 60 to the moon"* became `db_update({"$set": {"country":
+"moon"}})` — and moving the wrong records; crashes include `KeyError: '_id'`
+and `ValueError` from malformed generated code. The pipeline had **0 unsafe
+executions in every run** (25/25 safe): its safety is by construction, the
+baseline's is probabilistic.
 
 ### 8.6 H4 — Semantic reviewer (LLM #2)
 
@@ -317,11 +327,16 @@ how a bounded system catches each kind of ambiguity.
 
 ### 9.2 Architecture insights
 
-- **No dictionary of word meanings.** Interpretation is delegated to the LLM;
-  ambiguity is resolved by a confirmation protocol. Only finite, structural
-  (operation-level) mappings live in the prompt. Synonyms such as
-  record/row/document/item are absorbed by the model, not enumerated
-  (`docs/glossary.md` is for readers, not the model).
+- **No closed dictionary of word meanings.** Interpretation is delegated to
+  the LLM; ambiguity is resolved by a confirmation protocol. The prompt does
+  contain finite, structural mappings (operation semantics, operator words,
+  generic-word examples such as "users"/"everyone" → `people`) and a few
+  illustrative examples of the protocol — including one involving "retire"
+  that demonstrates confirm-with-alternatives. The claim is deliberately
+  narrower than "no dictionary anywhere": there is no closed, enumerable
+  vocabulary list and no rule module resolving arbitrary domain words;
+  synonyms such as record/row/document/item are absorbed by the model, not
+  enumerated (`docs/glossary.md` is for readers, not the model).
 - **IR constraints surface failure modes.** Requiring `condition` caused the
   LLM to hallucinate a filter; making it optional removed the failure at its
   source. The IR is the primary design surface.
@@ -330,13 +345,30 @@ how a bounded system catches each kind of ambiguity.
 - **The reviewer is a second, independent probabilistic layer** — it catches
   valid-but-wrong IRs (8/8) but also self-contradicts (1/20).
 
-### 9.3 Limitations and threats to validity
+### 9.3 Limitations, threats to validity, and submission status
 
-Single domain (database instructions); single-clause conditions (no compound
-constraints/exceptions in the IR yet); no joins or composition; temperature 0
-and one model (`deepseek-chat`); small author-written benchmarks; the reviewer
-and GUI additions came after the main benchmark runs. Cross-model, larger-scale,
-and multi-domain replications are future work.
+- **Scale.** n = 20/4/5/8 per condition is a demonstration, not a benchmark;
+  the sizes were hand-chosen, not sized for statistical power. There is no
+  held-out set: the same person wrote the system prompt and the test cases.
+- **Single model, single temperature.** All results use `deepseek-chat` at
+  temperature 0; cross-model replication (e.g. GPT-4o-mini, Claude Haiku) is
+  required before claiming model independence.
+- **Self-built baseline.** The direct-code baseline is a sandbox written by
+  the authors, not a tuned third-party NL2SQL/code-generation system.
+- **Reviewer independence.** LLM #2 is the same model family as the
+  translator, so its 8/8 detection rate may partly reflect a model agreeing
+  with itself.
+- **In scope but disclosed:** single domain; single-clause conditions (no
+  compound constraints or exceptions in the IR); no joins or composition;
+  the GUI and reviewer additions postdate the main benchmark runs.
+
+As it stands, this work is best positioned as a **workshop paper or arXiv
+preprint** (systems/tools track of an NL-programming or LLM-systems workshop):
+its soundest contributions — the bounded-boundary architecture, the design
+evolution of §7, and the failure taxonomy of §9.1 — are honestly reported and
+auditable. A full conference or journal submission additionally requires the
+scale and independence items above: larger held-out benchmarks, ≥2 models,
+independent or inter-rater scoring, and a stronger, equally-tuned baseline.
 
 ## 10. Conclusion and Future Work
 
@@ -344,11 +376,28 @@ and multi-domain replications are future work.
   validation/compilation achieves paraphrase convergence (20/20), asks instead
   of guessing (4/4), is safe on adversarial input (5/5), and outperforms direct
   code generation (20/20 vs 14–16/20) while eliminating silent corruption. It
-  maps any natural language to the same IR and keeps no dictionary of word
-  meanings — ambiguity is resolved by clarification and confirmation protocols,
+  maps any natural language to the same IR and resolves word meanings by
+  inference rather than any closed dictionary — ambiguity is handled by
+  clarification and confirmation protocols,
   and the failure taxonomy shows precisely which layer catches which failure.
 - Future work: compound conditions and exceptions in the IR; joins and
   aggregation; multi-domain front ends; integrating the reviewer into the
   pipeline with a cost analysis; larger benchmark sets; other models;
   persistent MongoDB deployment of the same pipeline.
+
+## References
+
+_[TODO before submission: complete exact titles, author lists, and pages;
+arXiv IDs below are verified as far as available.]_
+
+1. Xu et al. AIOS Compiler / CoRE — an LLM as interpreter for natural-language
+   programming. arXiv:2405.06907.
+2. Hu et al. Linguine — a natural-language-inspired language with a formal
+   compiler pipeline and verification. arXiv:2506.08396.
+3. Kaddar et al. NoviCode — generating programs from natural-language
+   utterances by novices. arXiv:2407.10626.
+4. _[TODO: fill]_ The 2014–2024 systematic literature review used as the field
+   map (20 selected studies).
+5. _[TODO: fill]_ Intermediate-representation / canonical-IR work between
+   natural-language descriptions and generated code or models.
 
