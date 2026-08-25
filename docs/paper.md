@@ -1,51 +1,82 @@
 # A Validated Semantic Boundary Between Natural Language and Database Execution
 
-> **Status:** Sections 3–10 contain the complete technical content, design
-> history, and measured results; the Abstract and the prose of the Introduction,
-> Background, and Related Work are left as guided placeholders.
-> All figures are measured from the runs saved in `results/` and audited by
-> `experiments/audit.py`.
-
 ## Abstract
 
-_[Write 150–250 words covering:]_
-- _the problem: natural language has no stable one-to-one mapping between words
-  and computational meaning ("remove the employees" has at least five readings);_
-- _the approach: an LLM as a probabilistic natural-language front end, bounded
-  by a formally specified intermediate representation and a deterministic
-  validator/compiler/runtime;_
-- _the method: five controlled experiments plus a direct-code-generation
-  baseline, on a database-instruction domain;_
-- _the results: 20/20 paraphrase convergence, 4/4 ambiguity detection and
-  clarification, 5/5 adversarial safety, 20/20 vs 14–16/20 baseline correctness
-  with zero unsafe executions (vs 6 audited unsafe executions for the baseline
-  across 5 runs), and an 8/8 detection rate for the second-LLM reviewer;_
-- _the key finding: safety comes from the deterministic boundary, not from the
-  model._
+Programming systems that accept instructions in unrestricted natural language
+would remove the syntax barrier, but natural language has no stable mapping from
+words to computational meaning: "remove the employees" admits several readings,
+each with a different effect on the data. This paper presents a
+database-instruction system in which a large language model (LLM) acts as a
+probabilistic front end that translates instructions into a formally specified,
+JSON-based intermediate representation (IR), while validation, compilation, and
+execution are performed entirely by deterministic code. The LLM never emits
+executable code and never executes; the IR is the boundary. Five controlled
+experiments, including a direct code-generation baseline, evaluate that
+boundary on a database-instruction domain. Semantically equivalent phrasings
+converged to one canonical IR in 20/20 cases; ambiguous instructions were met
+with grounded clarification rather than guesses in 4/4 cases; adversarial
+instructions were handled safely in 5/5 cases, with zero unsafe executions
+across every run, while the baseline executed unsafe operations in 6 of 25
+adversarial cases (audited across 5 runs) and crashed twice. On the shared
+paraphrase task the system scored 20/20 against the baseline's 14–16/20, and a
+second LLM reviewing (instruction, IR) pairs detected all 8 corrupted-but-valid
+IRs. The evidence indicates that safety and reliability come from the
+deterministic boundary, not from the model.
 
 ## 1. Introduction
 
-_[Write narrative prose. Required elements:]_
+Programming languages have spent decades moving toward human readability: from
+machine code to structured programming, from manual memory management to
+garbage collection, and from verbose annotations to type inference. One
+boundary, however, has not moved. Developers must still learn rigid syntax and
+language-specific constructs, and programs remain opaque to non-programmers.
+Given the fluency of modern large language models (LLMs), the tempting question
+is "what if English were a programming language?" Building the system described
+in this paper showed that this is the wrong question. English is not a
+programming language with slightly ambiguous surface syntax over precise
+semantics; it is a language in which the same words carry several incompatible
+computational meanings, and the listener is expected to resolve them from
+context.
 
-- Programming languages have moved toward human readability, yet developers
-  still learn rigid syntax and language-specific constructs. The tempting
-  question — "what if English were a programming language?" — turns out to be
-  the wrong one.
-- What building this system exposed: natural language does not give a stable
-  word→computation mapping. *"Remove the employees."* can mean: delete the
-  employee documents, remove employees from a group, drop the `employees`
-  collection, remove employees from another collection, or exclude them from a
-  query. *"Move the old people to pension."* has uncertainty in every token:
-  "old" (which field? which threshold?), "people" (which collection?),
-  "pension" (collection, field, or destination?), "move" (copy + delete, update
-  a field, or transfer?).
-- **Claim:** *LLMs can provide a flexible natural-language interface to a
-  programming system, but their probabilistic interpretation must be bounded by
-  a deterministic semantic representation and execution layer.*
-- **Research question:** *Can a validated intermediate representation provide a
-  reliable boundary between unconstrained natural-language instructions and
-  deterministic program execution?*
-- Contributions:
+What the system exposed is that natural language gives no stable mapping from
+words to computation. "Remove the employees." can mean delete the employee
+records, remove employees from a group, drop the `employees` collection
+entirely, remove employees from some other collection, or simply exclude them
+from a query result — one sentence, several different database effects. "Move
+the old people to pension." carries uncertainty in every token: "old" (which
+field? which threshold?), "people" (which collection?), "pension" (a
+destination collection, a field, or a status?), and "move" (copy then delete,
+update a field, or transfer a reference?).
+
+These ambiguities are not noise to be eliminated; they are a property of
+language that a programming interface must manage. We therefore make the
+following claim: *LLMs can provide a flexible natural-language interface to a
+programming system, but their probabilistic interpretation must be bounded by a
+deterministic semantic representation and execution layer.* In the system
+presented here, the LLM has exactly one job — translating unrestricted natural
+language into a formally specified intermediate representation (IR), a
+structured JSON document defined by a strict schema. Everything downstream of
+the IR — validation, compilation to a database plan, and execution — is
+deterministic code. The LLM never emits executable code and never executes
+anything.
+
+The research question follows directly: *Can a validated intermediate
+representation provide a reliable boundary between unconstrained
+natural-language instructions and deterministic program execution?* We answer
+it empirically with five controlled experiments on a database-instruction
+domain: paraphrase convergence, ambiguity detection and clarification,
+adversarial safety, a comparison against a direct code-generation baseline,
+and a second-LLM semantic review. All figures are measured from saved run data
+and audited by script.
+
+The remainder of the paper is organized as follows. §2 gives background; §3
+positions this work against related approaches; §4 states the hypotheses; §5
+presents the architecture and its deterministic boundary; §6 describes the
+implementation; §7 documents the design evolution — nine observed failures and
+their structural fixes; §8 reports the evaluation; §9 discusses the resulting
+failure taxonomy, architectural insights, and limitations; §10 concludes.
+
+**Contributions:**
   1. an architecture with a strict deterministic boundary after the LLM — the
      LLM translates, never executes, and cannot emit code;
   2. a formally specified IR for a database-instruction domain
@@ -64,22 +95,98 @@ _[Write narrative prose. Required elements:]_
 
 ## 2. Background
 
-_[Write prose, one short paragraph each:]_ programming languages; program
-synthesis; natural-language programming; LLM code generation; intermediate
-representations. Anchor the terminology from `docs/glossary.md`
-(collection ≈ table; record ≈ row/document/item; field ≈ column).
+**Programming languages.** Programming languages abstract over machine
+behavior, and the industry's direction of travel has been toward readability
+and abstraction. But the syntax barrier remains absolute: a program is only a
+program if it parses, and only correct if it type-checks. The human adapts to
+the language, not the reverse.
+
+**Program synthesis and semantic parsing.** Two long-standing research lines
+attempt to remove the syntax burden from the other direction. Program synthesis
+constructs programs from examples or specifications; semantic parsing maps
+sentences onto executable logical forms, with learned grammars and
+combinatory-categorial or lambda-calculus targets [9, 10]. Both traditions
+demonstrate that natural language can be mapped to formal meaning — but they
+either constrain the input language or aim the output at a fixed formal
+language, and they do not offer an interactive protocol for what to do when a
+sentence is ambiguous.
+
+**Natural-language programming.** A complementary line treats natural language
+itself as the programming notation: interpreters for natural-language programs
+[1], and controlled natural languages with formal semantics, type systems, and
+compiler pipelines [2]. These systems trade expressiveness for soundness — the
+language is restricted until a classical pipeline can reason about it.
+
+**LLM code generation.** LLMs trained on code generate executable programs
+directly from natural-language descriptions [6, 7], surveyed comprehensively in
+the NL2Code literature [5]. Direct generation is remarkably capable but
+probabilistic end to end: nothing between the model's output and execution
+guarantees that the generated code means what the user said, a gap that
+execution-based evaluations make measurable [3].
+
+**Intermediate representations.** Compilers have always centered on IRs that
+separate meaning from surface syntax. This work adopts that idea at the
+human–machine boundary: a canonical IR between unrestricted natural language
+and deterministic execution, with the additional, deliberately simple step that
+the IR is the only artifact the probabilistic component may produce.
+
+Throughout this paper we use the database terminology of the implemented
+domain: a **collection** corresponds to a table; a **record** to a row,
+document, or item; and a **field** to a column or attribute. Records carry a
+unique `_id`.
 
 ## 3. Related Work
 
-_[Write prose, 5–10 papers, using the checklist in `docs/research-map.md`:]_
-AIOS/CoRE (LLM as interpreter of NL programs), Linguine (NL-inspired language
-with a formal compiler pipeline), NoviCode (non-programmers; execution-based
-evaluation), intermediate-representation/code-generation work, and the 2014–2024
-systematic review as the field map. For each paper: what it does, and what this
-system does differently. The differentiator to state clearly: prior approaches
-either let the LLM emit executable code directly, or fix a controlled language;
-this work keeps the language **unrestricted** and moves all determinism behind a
-formal IR boundary — and evaluates that boundary directly.
+**Surveys and the field map.** Hou et al. [4] systematically review 395 papers
+on LLMs for software engineering (2017–2024), and Zan et al. [5] survey 27
+large language models for NL2Code. We use these as the field map rather than as
+competitors: they catalog end-to-end generation systems, none of which is
+organized around a validated semantic boundary of the kind evaluated here.
+
+**Semantic parsing and structured intermediates.** Zettlemoyer and Collins [9]
+learn to map sentences to lambda-calculus logical forms with probabilistic
+combinatory categorial grammars; Liang [10] defines dependency-based
+compositional semantics for the same goal. In text-to-SQL, RAT-SQL [8] builds a
+relation-aware intermediate encoding between question and query. These works
+show that structured meanings can sit between language and execution — but the
+structured artifact is the *output* of a learned parser that then becomes the
+program itself; ambiguity handling is not part of the interface, and the input
+language is constrained to the domain's grammar. Here the IR is instead a
+*validation boundary*: the model proposes it, deterministic code checks it, and
+an interactive protocol resolves whatever the model cannot determine.
+
+**Direct LLM code generation.** Codex [6] and the MBPP line of work [7]
+generate executable code directly from natural language, and this remains the
+dominant paradigm. NoviCode [3] shows that descriptions written by
+non-programmers are still beyond current text-to-code models, and evaluates
+programs by whether they *execute correctly* rather than whether they look
+right. These systems put the LLM on both sides of the trust boundary: the model
+both interprets the instruction and produces the executable artifact, so a
+semantic error is executable by construction. This work removes the second
+role: the LLM cannot produce code at all.
+
+**LLM as interpreter.** The AIOS Compiler / CoRE [1] positions an LLM as the
+interpreter of natural-language programs and agent flows, unifying natural
+language, pseudocode, and flow programming under one representation. The
+interpreter is the model itself, so execution remains probabilistic. Here,
+interpretation stops at the IR; from that point on the "interpreter" is
+deterministic Python and MongoDB operations.
+
+**Controlled natural language with formal semantics.** Linguine [2] is the
+closest architectural relative: a natural-language-inspired language with
+anaphoric constructs, referent tracking, a Hindley–Milner-style type system,
+and a compiler pipeline (lexing → clause graph → typed IR → verification →
+code) that proves properties such as unambiguous pronoun resolution. Its
+soundness comes from fixing the language. We take the complementary trade: the
+language stays **unrestricted**, soundness is replaced by *validation* — wrong
+meanings are caught, not proved absent — and the unresolved remainder of
+natural language is handled by clarification and confirmation protocols.
+
+In summary, prior approaches sit at two poles: the LLM emits executable code
+directly [1, 3, 6, 7], or the language is fixed and controlled so that a formal
+pipeline can be built [2, 9, 10]. This work occupies the position in between:
+the language remains unrestricted, and all determinism is moved behind a formal
+IR boundary — and that boundary is the thing evaluated.
 
 ## 4. Research Question and Framing
 
@@ -387,17 +494,36 @@ independent or inter-rater scoring, and a stronger, equally-tuned baseline.
 
 ## References
 
-_[TODO before submission: complete exact titles, author lists, and pages;
-arXiv IDs below are verified as far as available.]_
+All arXiv identifiers and author lists verified against arXiv as of August
+2026.
 
-1. Xu et al. AIOS Compiler / CoRE — an LLM as interpreter for natural-language
-   programming. arXiv:2405.06907.
-2. Hu et al. Linguine — a natural-language-inspired language with a formal
-   compiler pipeline and verification. arXiv:2506.08396.
-3. Kaddar et al. NoviCode — generating programs from natural-language
-   utterances by novices. arXiv:2407.10626.
-4. _[TODO: fill]_ The 2014–2024 systematic literature review used as the field
-   map (20 selected studies).
-5. _[TODO: fill]_ Intermediate-representation / canonical-IR work between
-   natural-language descriptions and generated code or models.
+1. Shuyuan Xu, Zelong Li, Kai Mei, and Yongfeng Zhang. "AIOS Compiler: LLM as
+   Interpreter for Natural Language Programming and Flow Programming of AI
+   Agents." arXiv:2405.06907, 2024.
+2. Lifan Hu. "Linguine: A Natural-Language Programming Language with Formal
+   Semantics and a Clean Compiler Pipeline." arXiv:2506.08396, 2025.
+3. Asaf Achi Mordechai, Yoav Goldberg, and Reut Tsarfaty. "NoviCode: Generating
+   Programs from Natural Language Utterances by Novices." arXiv:2407.10626,
+   2024.
+4. Xinyi Hou, Yanjie Zhao, Yue Liu, Zhou Yang, Kailong Wang, Li Li, Xiapu Luo,
+   David Lo, John Grundy, et al. "Large Language Models for Software
+   Engineering: A Systematic Literature Review." ACM Transactions on Software
+   Engineering and Methodology, 2024. arXiv:2308.10620.
+5. Daoguang Zan, Bei Chen, Fengji Zhang, Dianjie Lu, Bingchao Wu, Bei Guan,
+   Yongji Wang, and Jian-Guang Lou. "Large Language Models Meet NL2Code: A
+   Survey." In Proceedings of ACL 2023. arXiv:2212.09420.
+6. Mark Chen et al. "Evaluating Large Language Models Trained on Code."
+   arXiv:2107.03374, 2021.
+7. Jacob Austin, Augustus Odena, Maxwell Nye, Maarten Bosma, Henryk
+   Michalewski, David Dohan, Ellen Jiang, Carrie Cai, Michael Terry, Quoc Le,
+   and Charles Sutton. "Program Synthesis with Large Language Models."
+   arXiv:2108.07732, 2021.
+8. Bailin Wang, Richard Shin, Xiaodong Liu, Oleksandr Polozov, and Matthew
+   Richardson. "RAT-SQL: Relation-Aware Schema Encoding and Linking for
+   Text-to-SQL Parsers." In Proceedings of ACL 2020. arXiv:1911.04942.
+9. Luke S. Zettlemoyer and Michael Collins. "Learning to Map Sentences to
+   Logical Form: Structured Classification with Probabilistic Categorial
+   Grammars." In Proceedings of UAI, 2005.
+10. Percy Liang. "Lambda Dependency-Based Compositional Semantics."
+    arXiv:1309.4408, 2013.
 
